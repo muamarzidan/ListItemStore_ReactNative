@@ -1,32 +1,44 @@
-import { View, Text, StyleSheet, Button} from 'react-native'
-import React from 'react'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React from 'react';
 
 const styles = StyleSheet.create({
-  container: {
+  main: {
     flex: 1,
     backgroundColor: '#ECF8F9',
-    marginHorizontal: 20
+    justifyContent: 'center',
+    alignItems: 'center',
   },
+  container: {
+    paddingHorizontal: 20,
+    alignItems: 'center',
+  },
+  text: {
+    color: 'black',
+    textAlign: 'center',
+    marginBottom: 20,
+    fontSize: 20,
+  },
+  button: {
+    alignItems: 'center',
+    backgroundColor: '#068DA9',
+    padding: 10,
+    width: 150,
+    borderRadius: 5,
+  }
 });
 
 export default function App() {
   return (
-    <View>  
+    <View style={styles.main}>
       <View style={styles.container}>
-        <View style={{justifyContent: 'center', alignItems: 'center'}}>
-          <Text style={{color: 'black'}}>Halo, selamat datang di Toko Tata Jaya Mandiri</Text>
-          <Button
-            // onPress={onPressLearnMore}
-            title="Login"
-            color="#068DA9"
-          />
-          <Button
-            // onPress={onPressLearnMore}
-            title="Cari Barang"
-            color="#068DA9"
-          />
-        </View>
+        <Text style={styles.text}>Halo, selamat datang di Toko ...</Text>
+        <TouchableOpacity style={styles.button}>
+          <Text style={{color: 'white'}}>Login</Text>
+       </TouchableOpacity>
+        <TouchableOpacity style={styles.button}>
+          <Text style={{color: 'white'}}>Cari Daftar Barang</Text>
+       </TouchableOpacity>
       </View>
     </View>
-  )
-};
+  );
+}
