@@ -37,7 +37,7 @@ export default function App({navigation}: AppProps) {
     <View style={styles.main}>
       <View style={styles.container}>
         <Text style={styles.text}>Halo, selamat datang di Toko ...</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('loginpage')} style={styles.button}>
+        <TouchableOpacity onPress={() => navigation.navigate('loginPage')} style={styles.button}>
           <Text style={{color: 'white'}}>Login</Text>
        </TouchableOpacity>
         <TouchableOpacity style={styles.button}>

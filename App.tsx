@@ -4,9 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import Index from './src/index';
-// import Login from './src/pages/LoginPage';
-// import Dashboard from './src/pages/DashboardPage';
-// import Item from './src/pages/ItemPage';
+import Login from './src/pages/LoginPage';
 
 const Stack = createNativeStackNavigator();
 
@@ -14,9 +12,10 @@ function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Index"
+        initialRouteName="indexPage"
         screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Index" component={Index} />
+        <Stack.Screen name="indexPage" component={Index} />
+        <Stack.Screen name="loginPage" component={Login} />
       </Stack.Navigator>
     </NavigationContainer>
   );
