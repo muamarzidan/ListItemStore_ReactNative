@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { NavigationProp } from '@react-navigation/native';
 import React from 'react';
 
-import ButtonNormal from './components/Button';
+import ButtonNormal from './components/button';
 
 const styles = StyleSheet.create({
   main: {
