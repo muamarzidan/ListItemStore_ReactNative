@@ -14,7 +14,7 @@ function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="indexPage"
+        initialRouteName="dashboardPage"
         screenOptions={{ headerShown: false }}>
         <Stack.Screen name="indexPage" component={Index} />
         <Stack.Screen name="loginPage" component={Login} />

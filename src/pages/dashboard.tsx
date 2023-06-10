@@ -47,21 +47,26 @@ export default function App({ navigation }: AppProps) {
     <View style={styles.main}>
       <View style={styles.container}>
         <Text style={styles.welcomeText}>Selamat datang di Toko {namaToko}</Text>
-        <ButtonNormal
-          onPress={() => navigation.navigate('loginPage')}
-          title="Login"
-          buttonStyle={styles.button}
-        />
-        <ButtonNormal
-          onPress={() => navigation.navigate('itemPage')}
-          title="Cari Barang"
-          buttonStyle={styles.button}
-        />
-        <ButtonNormal
-          onPress={handleLogout}
-          title="Logout"
-          buttonStyle={styles.button}
-        />
+        <View style={{width: 280, flexDirection: 'row', justifyContent: 'space-between', borderColor: 'red', borderWidth: 1, marginTop: 20}}>
+          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('itemPage')}>
+            <Text style={{fontSize: 16, textAlign: 'center'}}>Tambah Data</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('itemPage')}>
+            <Text style={{fontSize: 16, textAlign: 'center'}}>Tambah Data</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={{width: 280, flexDirection: 'row', justifyContent: 'space-between', borderColor: 'red', borderWidth: 1, marginTop: 20}}>
+          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('itemPage')}>
+            <Text style={{fontSize: 16, textAlign: 'center'}}>Tambah Data</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('itemPage')}>
+            <Text style={{fontSize: 16, textAlign: 'center'}}>Hapus Data</Text>
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity style={styles.buttonLogout} onPress={() => navigation.navigate('itemPage')}>
+          <Text style={{fontSize: 16, textAlign: 'center'}}>Tambah Data</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -77,19 +82,31 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
     alignItems: 'center',
+    borderColor: 'red',
+    borderWidth: 1,
   },
   welcomeText: {
     color: 'black',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 10,
     fontSize: 20,
   },
   button: {
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#068DA9',
     padding: 10,
-    width: 150,
-    borderRadius: 5,
-    marginTop: 10,
+    width: 120,
+    height: 120,
+    borderRadius: 10,
   },
+  buttonLogout: {
+    marginTop: 20,
+    justifyContent: 'center',
+    backgroundColor: '#068DA9',
+    padding: 10,
+    width: 280,
+    height: 45,
+    borderRadius: 5,
+  }
 });
