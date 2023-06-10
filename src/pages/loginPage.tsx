@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-nativ
 import { NavigationProp } from '@react-navigation/native';
 
 
+
 interface AppProps {
   navigation: NavigationProp<any>;
 }
