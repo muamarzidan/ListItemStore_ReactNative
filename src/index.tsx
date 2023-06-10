@@ -3,6 +3,29 @@ import { NavigationProp } from '@react-navigation/native';
 import React from 'react';
 
 import ButtonNormal from './components/button';
+interface AppProps {
+  navigation: NavigationProp<any>;
+}
+
+export default function App({ navigation }: AppProps) { 
+  return (
+    <View style={styles.main}>
+      <View style={styles.container}>
+        <Text style={styles.welcomeText}>Selamat datang di Toko Anda</Text>
+        <ButtonNormal
+          onPress={() => navigation.navigate('loginPage')}
+          title="Login"
+          buttonStyle={styles.button}
+        />
+        <ButtonNormal
+          onPress={() => navigation.navigate('itemPage')}
+          title="Cari Barang"
+          buttonStyle={styles.button}
+        />
+      </View>
+    </View>
+  );
+}
 
 const styles = StyleSheet.create({
   main: {
@@ -29,27 +52,3 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   }
 });
-
-interface AppProps {
-  navigation: NavigationProp<any>;
-}
-
-export default function App({ navigation }: AppProps) { 
-  return (
-    <View style={styles.main}>
-      <View style={styles.container}>
-        <Text style={styles.welcomeText}>Selamat datang di Toko Anda</Text>
-        <ButtonNormal
-          onPress={() => navigation.navigate('loginPage')}
-          title="Login"
-          buttonStyle={styles.button}
-        />
-        <ButtonNormal
-          onPress={() => navigation.navigate('loginPage')}
-          title="Cari Barang"
-          buttonStyle={styles.button}
-        />
-      </View>
-    </View>
-  );
-}
