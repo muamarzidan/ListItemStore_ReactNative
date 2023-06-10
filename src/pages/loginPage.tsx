@@ -1,25 +1,29 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { NavigationProp } from '@react-navigation/native';
-
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface AppProps {
   navigation: NavigationProp<any>;
 }
 
 export default function LoginPage({ navigation }: AppProps) {
-  const [adminName, setAdminName] = useState('');
+  const [namaToko, setNamaToko] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    // Proses login admin
-    console.log('Admin Name:', adminName);
-    console.log('Password:', password);
+  const handleLogin = async () => {
+    const storedNamaToko = await AsyncStorage.getItem('namaToko');
+    const storedPassword = await AsyncStorage.getItem('password');
+
+    if (namaToko === storedNamaToko && password === storedPassword) {
+      navigation.navigate('dashboardPage');
+    } else {
+      Alert.alert('Nama toko atau password salah');
+    }
   };
 
   const handleRegister = () => {
-    navigation.navigate('daftarPage');
+    navigation.navigate('registerPage');
   };
 
   return (
@@ -28,9 +32,9 @@ export default function LoginPage({ navigation }: AppProps) {
 
       <TextInput
         style={styles.input}
-        placeholder="Nama Admin"
-        onChangeText={setAdminName}
-        value={adminName}
+        placeholder="Nama Toko"
+        onChangeText={setNamaToko}
+        value={namaToko}
       />
 
       <TextInput
@@ -70,19 +74,20 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
   },
-  registerText: {
-    color: 'blue',
-    textDecorationLine: 'underline',
-    marginBottom: 10,
-  },
   loginButton: {
     backgroundColor: 'blue',
     paddingVertical: 10,
     borderRadius: 5,
+    marginTop: 10,
   },
   loginButtonText: {
     color: 'white',
     textAlign: 'center',
     fontWeight: 'bold',
+  },
+  registerText: {
+    color: 'green',
+    textDecorationLine: 'underline',
+    marginBottom: 10,
   },
 });

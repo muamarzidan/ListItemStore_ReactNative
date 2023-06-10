@@ -1,22 +1,28 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert} from 'react-native';
 import { NavigationProp } from '@react-navigation/native';
-
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
+  
 interface AppProps {
   navigation: NavigationProp<any>;
 }
 
 export default function RegisterPage({ navigation }: AppProps) {
-  const [storeName, setStoreName] = useState('');
-  const [adminName, setAdminName] = useState('');
+  const [namaToko, setNamaToko] = useState('');
+  const [namaAdmin, setNamaAdmin] = useState('');
   const [password, setPassword] = useState('');
 
   const handleRegister = () => {
-    // Proses pendaftaran admin
-    console.log('Store Name:', storeName);
-    console.log('Admin Name:', adminName);
-    console.log('Password:', password);
+    if (namaToko === '' || namaAdmin === '' || password === '') {
+      Alert.alert('Harap isi semua form terlebih dahulu');
+      return;
+    }
+    AsyncStorage.setItem('namaToko', namaToko);
+    AsyncStorage.setItem('namaAdmin', namaAdmin);
+    AsyncStorage.setItem('password', password);
+
+    //then return to dashboard page
+    navigation.navigate('dashboardPage');
   };
 
   const handleLogin = () => {
@@ -30,15 +36,15 @@ export default function RegisterPage({ navigation }: AppProps) {
       <TextInput
         style={styles.input}
         placeholder="Nama Toko"
-        onChangeText={setStoreName}
-        value={storeName}
+        onChangeText={setNamaToko}
+        value={namaToko}
       />
 
       <TextInput
         style={styles.input}
         placeholder="Nama Admin"
-        onChangeText={setAdminName}
-        value={adminName}
+        onChangeText={setNamaAdmin}
+        value={namaAdmin}
       />
 
       <TextInput

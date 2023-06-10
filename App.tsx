@@ -5,7 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import Index from './src/index';
 import Login from './src/pages/loginPage';
-import Daftar from './src/pages/singupPage';
+import Daftar from './src/pages/registerPage';
 import Dashboard from './src/pages/dashboard';
 
 const Stack = createNativeStackNavigator();
@@ -18,7 +18,7 @@ function App() {
         screenOptions={{ headerShown: false }}>
         <Stack.Screen name="indexPage" component={Index} />
         <Stack.Screen name="loginPage" component={Login} />
-        <Stack.Screen name="daftarPage" component={Daftar} />
+        <Stack.Screen name="registerPage" component={Daftar} />
         <Stack.Screen name="dashboardPage" component={Dashboard} />
       </Stack.Navigator>
     </NavigationContainer>
