@@ -48,17 +48,17 @@ export default function App({ navigation }: AppProps) {
   return (
     <View style={styles.main}>
       <View style={styles.container}>
-        <Text style={styles.welcomeText}>Selamat datang di Dashboard Toko {namaToko}</Text>
+        <Text style={styles.welcomeText}>Selamat datang di Dashboard Toko saya{namaToko}</Text>
         <View style={{width: 280, flexDirection: 'row', justifyContent: 'space-between', borderColor: 'red', borderWidth: 1, marginTop: 20}}>
           <ButtonAdmin jc='center' AlIt='center' bc='#54B435' wdth={120} hght={120} pd={10} br={10}
             gotoPage={() => {
-              navigation.navigate('DashboardPage');
+              navigation.navigate('createPage');
             }}>
             Tambah Data
           </ButtonAdmin>
           <ButtonAdmin jc='center' AlIt='center' bc='#00235B' wdth={120} hght={120} pd={10} br={10}
             gotoPage={() => {
-              navigation.navigate('DashboardPage');
+              navigation.navigate('updatePage');
             }}>
             Update Data
           </ButtonAdmin>
@@ -66,13 +66,13 @@ export default function App({ navigation }: AppProps) {
         <View style={{width: 280, flexDirection: 'row', justifyContent: 'space-between', borderColor: 'red', borderWidth: 1, marginTop: 20}}>
           <ButtonAdmin jc='center' AlIt='center' bc='#7E1717' wdth={120} hght={120} pd={10} br={10}
             gotoPage={() => {
-              navigation.navigate('DashboardPage');
+              navigation.navigate('searchPage');
             }}>
             Cari Data
           </ButtonAdmin>
           <ButtonAdmin jc='center' AlIt='center' bc='#E21818' wdth={120} hght={120} pd={10} br={10}
             gotoPage={() => {
-              navigation.navigate('DashboardPage');
+              navigation.navigate('deletePage');
             }}>
             Hapus Data
           </ButtonAdmin>
