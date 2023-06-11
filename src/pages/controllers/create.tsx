@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -8,66 +8,92 @@ const CreatePage = () => {
   const [hargaAwal, setHargaAwal] = useState('');
   const [hargaJual, setHargaJual] = useState('');
 
-  const handleInsert = async () => {
+  const handleSubmit = async () => {
+    if (!kodeBarang || !namaBarang || !hargaAwal || !hargaJual) {
+      Alert.alert('Mohon isi semua data terlebih dahulu');
+      return;
+    }
+
     const barang = {
       kodeBarang,
       namaBarang,
       hargaAwal,
       hargaJual,
     };
-
-    const existingData = await AsyncStorage.getItem('dataBarang');
-    const dataBarang = existingData ? JSON.parse(existingData) : [];
+    const hasilDataBarang = await AsyncStorage.getItem('dataBarang');
+    const dataBarang = hasilDataBarang ? JSON.parse(hasilDataBarang) : [];
+    
     dataBarang.push(barang);
-
     await AsyncStorage.setItem('dataBarang', JSON.stringify(dataBarang));
 
     setKodeBarang('');
     setNamaBarang('');
     setHargaAwal('');
     setHargaJual('');
-
     Alert.alert('Data barang berhasil ditambahkan');
   };
+
+  // loop create
+  // const autoCreateData = async () => {
+  //   for (let i = 0; i < 100000; i++) {
+  //     const barang = {
+  //       kodeBarang: `NPS${i + 1}`,
+  //       namaBarang: `Lampu Watt ${i + 1}`,
+  //       hargaAwal: `Rp.${i + 1000}`,
+  //       hargaJual: `Rp.${i + 1500}`,
+  //     };
+  //     const hasilDataBarang = await AsyncStorage.getItem('dataBarang');
+  //     const dataBarang = hasilDataBarang ? JSON.parse(hasilDataBarang) : [];
+      
+  //     dataBarang.push(barang);
+  //     await AsyncStorage.setItem('dataBarang', JSON.stringify(dataBarang));
+  //   }
+
+  //   Alert.alert('Data barang berhasil dibuat secara otomatis');
+  // };
+
+  // useEffect(() => {
+  //   const isTesting = true;
+  //   if (isTesting) {
+  //     autoCreateData();
+  //   }
+  // }, []);
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Tambah Barang</Text>
-
       <TextInput
         style={styles.input}
         placeholder="Kode Barang"
         onChangeText={setKodeBarang}
         value={kodeBarang}
       />
-
       <TextInput
         style={styles.input}
         placeholder="Nama Barang"
         onChangeText={setNamaBarang}
         value={namaBarang}
       />
-
       <TextInput
         style={styles.input}
         placeholder="Harga Awal"
         onChangeText={setHargaAwal}
         value={hargaAwal}
       />
-
       <TextInput
         style={styles.input}
         placeholder="Harga Jual"
         onChangeText={setHargaJual}
         value={hargaJual}
       />
-
-      <TouchableOpacity style={styles.addButton} onPress={handleInsert}>
+      
+      <TouchableOpacity style={styles.addButton} onPress={handleSubmit}>
         <Text style={styles.buttonText}>Tambah</Text>
       </TouchableOpacity>
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
