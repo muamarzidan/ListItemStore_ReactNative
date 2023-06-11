@@ -11,7 +11,7 @@ const styles  = StyleSheet.create({
     },
 });
 
-const textInNormal = ({ placeholder, value, onChangeText, secureTextEntry }) => {
+const textinputNormal = ({ placeholder, value, onChangeText, secureTextEntry }) => {
     return (
         <View>
             <TextInput

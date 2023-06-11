@@ -3,6 +3,7 @@ import { NavigationProp } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { ButtonAdmin } from '../components/button';
 import ButtonNormal from '../components/button';
 
 interface AppProps {
@@ -24,7 +25,7 @@ export default function App({ navigation }: AppProps) {
   const handleLogout = () => {
     Alert.alert(
       'Konfirmasi Logout',
-      'Yakin akan logout? Nama toko, Admin, dan password akan terhapus. Anda harus daftar ulang',
+      'Yakin akan logout? Nama toko, Admin, dan password akan terhapus. Anda harus daftar ulang lagi',
       [
         {
           text: 'Cancel',
@@ -35,6 +36,7 @@ export default function App({ navigation }: AppProps) {
           onPress: async () => {
             await AsyncStorage.removeItem('namaAdmin');
             await AsyncStorage.removeItem('password');
+            await AsyncStorage.removeItem('namaToko');
             navigation.navigate('loginPage');
           },
         },
@@ -46,26 +48,41 @@ export default function App({ navigation }: AppProps) {
   return (
     <View style={styles.main}>
       <View style={styles.container}>
-        <Text style={styles.welcomeText}>Selamat datang di Toko {namaToko}</Text>
+        <Text style={styles.welcomeText}>Selamat datang di Dashboard Toko {namaToko}</Text>
         <View style={{width: 280, flexDirection: 'row', justifyContent: 'space-between', borderColor: 'red', borderWidth: 1, marginTop: 20}}>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('itemPage')}>
-            <Text style={{fontSize: 16, textAlign: 'center'}}>Tambah Data</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('itemPage')}>
-            <Text style={{fontSize: 16, textAlign: 'center'}}>Tambah Data</Text>
-          </TouchableOpacity>
+          <ButtonAdmin jc='center' AlIt='center' bc='#54B435' wdth={120} hght={120} pd={10} br={10}
+            gotoPage={() => {
+              navigation.navigate('DashboardPage');
+            }}>
+            Tambah Data
+          </ButtonAdmin>
+          <ButtonAdmin jc='center' AlIt='center' bc='#00235B' wdth={120} hght={120} pd={10} br={10}
+            gotoPage={() => {
+              navigation.navigate('DashboardPage');
+            }}>
+            Update Data
+          </ButtonAdmin>
         </View>
         <View style={{width: 280, flexDirection: 'row', justifyContent: 'space-between', borderColor: 'red', borderWidth: 1, marginTop: 20}}>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('itemPage')}>
-            <Text style={{fontSize: 16, textAlign: 'center'}}>Tambah Data</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('itemPage')}>
-            <Text style={{fontSize: 16, textAlign: 'center'}}>Hapus Data</Text>
-          </TouchableOpacity>
+          <ButtonAdmin jc='center' AlIt='center' bc='#7E1717' wdth={120} hght={120} pd={10} br={10}
+            gotoPage={() => {
+              navigation.navigate('DashboardPage');
+            }}>
+            Cari Data
+          </ButtonAdmin>
+          <ButtonAdmin jc='center' AlIt='center' bc='#E21818' wdth={120} hght={120} pd={10} br={10}
+            gotoPage={() => {
+              navigation.navigate('DashboardPage');
+            }}>
+            Hapus Data
+          </ButtonAdmin>
         </View>
 
-        <TouchableOpacity style={styles.buttonLogout} onPress={() => navigation.navigate('itemPage')}>
-          <Text style={{fontSize: 16, textAlign: 'center'}}>Tambah Data</Text>
+        <TouchableOpacity style={styles.buttonLogout} onPress={handleLogout}>
+          <Text style={{fontSize: 16, textAlign: 'center', color: 'white'}}>Logout</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.buttonHome} onPress={()=> navigation.navigate ('indexPage')}>
+          <Text style={{fontSize: 16, textAlign: 'center', color: 'white'}}>Home</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -101,7 +118,16 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   buttonLogout: {
-    marginTop: 20,
+    marginTop: 30,
+    justifyContent: 'center',
+    backgroundColor: '#068DA9',
+    padding: 10,
+    width: 280,
+    height: 45,
+    borderRadius: 5,
+  },
+  buttonHome: {
+    marginTop: 10,
     justifyContent: 'center',
     backgroundColor: '#068DA9',
     padding: 10,

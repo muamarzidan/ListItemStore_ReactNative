@@ -1,5 +1,7 @@
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet, TouchableOpacityProps, StyleProp, ViewStyle, TextStyle } from 'react-native';
+
 
 
 interface buttonNormalProps extends TouchableOpacityProps {
@@ -7,6 +9,19 @@ interface buttonNormalProps extends TouchableOpacityProps {
     buttonStyle?: StyleProp<ViewStyle>;
     textStyle?: StyleProp<TextStyle>;
 }
+
+type ButtonProps = TouchableOpacityProps & {
+  jc?: 'flex-start' | 'flex-end' | 'center' | 'space-between' | 'space-around' | 'space-evenly';
+  AlIt?: 'stretch' | 'flex-start' | 'flex-end' | 'center' | 'baseline';
+  mT?: number;
+  clr?: string;
+  wdth?: number;
+  hght?: number;
+  bc?: string;
+  pd?: number;
+  br?: number;
+  gotoPage: () => void;
+};
 
 const buttonNormal: React.FC<buttonNormalProps> = ({ onPress, title, buttonStyle, textStyle}) => {
   return (
@@ -16,22 +31,11 @@ const buttonNormal: React.FC<buttonNormalProps> = ({ onPress, title, buttonStyle
   );
 };
 
-type ButtonProps = TouchableOpacityProps & {
-  jc?: 'flex-start' | 'flex-end' | 'center' | 'space-between' | 'space-around' | 'space-evenly';
-  mT?: number;
-  clr?: string;
-  wdth?: number;
-  hght?: number;
-  bc?: string;
-  pd?: number;
-  br?: number;
-};
-
 export const ButtonAdmin = (props: ButtonProps) => {
-  const { jc, mT, bc, wdth, hght, pd, br, ...otherProps } = props;
-
+  const { jc, AlIt, mT, bc, wdth, hght, pd, br, children, gotoPage, ...otherProps } = props;
   const buttonStyle: ViewStyle = {
-    justifyContent: jc || 'flex-start',
+    justifyContent: jc,
+    alignItems: AlIt,
     marginTop: mT,
     backgroundColor: bc,
     width: wdth,
@@ -40,12 +44,25 @@ export const ButtonAdmin = (props: ButtonProps) => {
     borderRadius: br,
   };
 
+  const textStyle: TextStyle = {
+    textAlign: 'center',
+    fontSize: 18,
+    color: 'white',
+  };
+  
+  const navigation = useNavigation();
+  const handlebuttonAdmin = () => {
+    gotoPage();
+  }
   return (
     <View>
-      <TouchableOpacity style={buttonStyle} {...otherProps} />
+      <TouchableOpacity style={buttonStyle} onPress={handlebuttonAdmin} {...otherProps}>
+        <Text style={textStyle}>{children}</Text>
+      </TouchableOpacity>
     </View>
   );
 };
+
 
 
 const styles = StyleSheet.create({
