@@ -48,7 +48,7 @@ export default function App({ navigation }: AppProps) {
   return (
     <View style={styles.main}>
       <View style={styles.container}>
-        <Text style={styles.welcomeText}>Selamat datang di Dashboard Toko saya{namaToko}</Text>
+        <Text style={styles.welcomeText}>Selamat datang di Dashboard Toko {namaToko}</Text>
         <View style={{width: 280, flexDirection: 'row', justifyContent: 'space-between', borderColor: 'red', borderWidth: 1, marginTop: 20}}>
           <ButtonAdmin jc='center' AlIt='center' bc='#54B435' wdth={120} hght={120} pd={10} br={10}
             gotoPage={() => {

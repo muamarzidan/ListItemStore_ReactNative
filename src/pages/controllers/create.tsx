@@ -43,11 +43,11 @@ const CreatePage = () => {
   // loop create
   const autoCreateData = async () => {
     for (let i = 0; i < 10; i++) {
-      const charCode = 65 + i; // Mendapatkan kode ASCII huruf berdasarkan urutan
-      const char = String.fromCharCode(charCode); // Mengonversi kode ASCII ke karakter huruf
+      const asciiCode = 65 + i; 
+      const newChar = String.fromCharCode(asciiCode);
 
       const barang = {
-        kodeBarang: `TJ${char}${i + 1}`,
+        kodeBarang: `TJ${newChar}${i + 1}`,
         namaBarang: `Lampu Watt ${i + 1}`,
         hargaAwal: `Rp.${i + 1000}`,
         hargaJual: `Rp.${i + 1500}`,
