@@ -1,5 +1,12 @@
-import React, { useState, useEffect} from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CreatePage = () => {
@@ -22,7 +29,7 @@ const CreatePage = () => {
     };
     const hasilDataBarang = await AsyncStorage.getItem('dataBarang');
     const dataBarang = hasilDataBarang ? JSON.parse(hasilDataBarang) : [];
-    
+
     dataBarang.push(barang);
     await AsyncStorage.setItem('dataBarang', JSON.stringify(dataBarang));
 
@@ -34,30 +41,34 @@ const CreatePage = () => {
   };
 
   // loop create
-  // const autoCreateData = async () => {
-  //   for (let i = 0; i < 100000; i++) {
-  //     const barang = {
-  //       kodeBarang: `NPS${i + 1}`,
-  //       namaBarang: `Lampu Watt ${i + 1}`,
-  //       hargaAwal: `Rp.${i + 1000}`,
-  //       hargaJual: `Rp.${i + 1500}`,
-  //     };
-  //     const hasilDataBarang = await AsyncStorage.getItem('dataBarang');
-  //     const dataBarang = hasilDataBarang ? JSON.parse(hasilDataBarang) : [];
-      
-  //     dataBarang.push(barang);
-  //     await AsyncStorage.setItem('dataBarang', JSON.stringify(dataBarang));
-  //   }
+  const autoCreateData = async () => {
+    for (let i = 0; i < 10; i++) {
+      const charCode = 65 + i; // Mendapatkan kode ASCII huruf berdasarkan urutan
+      const char = String.fromCharCode(charCode); // Mengonversi kode ASCII ke karakter huruf
 
-  //   Alert.alert('Data barang berhasil dibuat secara otomatis');
-  // };
+      const barang = {
+        kodeBarang: `TJ${char}${i + 1}`,
+        namaBarang: `Lampu Watt ${i + 1}`,
+        hargaAwal: `Rp.${i + 1000}`,
+        hargaJual: `Rp.${i + 1500}`,
+      };
 
-  // useEffect(() => {
-  //   const isTesting = true;
-  //   if (isTesting) {
-  //     autoCreateData();
-  //   }
-  // }, []);
+      const hasilDataBarang = await AsyncStorage.getItem('dataBarang');
+      const dataBarang = hasilDataBarang ? JSON.parse(hasilDataBarang) : [];
+
+      dataBarang.push(barang);
+      await AsyncStorage.setItem('dataBarang', JSON.stringify(dataBarang));
+    }
+
+    Alert.alert('Data barang berhasil dibuat secara otomatis');
+  };
+
+  useEffect(() => {
+    const isTesting = true;
+    if (isTesting) {
+      autoCreateData();
+    }
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -86,14 +97,13 @@ const CreatePage = () => {
         onChangeText={setHargaJual}
         value={hargaJual}
       />
-      
+
       <TouchableOpacity style={styles.addButton} onPress={handleSubmit}>
         <Text style={styles.buttonText}>Tambah</Text>
       </TouchableOpacity>
     </View>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {
