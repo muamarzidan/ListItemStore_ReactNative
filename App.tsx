@@ -9,6 +9,7 @@ import Daftar from './src/pages/registerPage';
 import Dashboard from './src/pages/dashboard';
 import FormCreate from './src/pages/controllers/create';
 import FormSearch from './src/pages/controllers/search';
+import FormDelete from './src/pages/controllers/delete';
 // import FormUpdate from './src/pages/controllers/update';
 
 const Stack = createNativeStackNavigator();
@@ -25,6 +26,7 @@ function App() {
         <Stack.Screen name="dashboardPage" component={Dashboard} />
         <Stack.Screen name="createPage" component={FormCreate} />
         <Stack.Screen name="searchPage" component={FormSearch} />
+        <Stack.Screen name="deletePage" component={FormDelete} />
       </Stack.Navigator>
     </NavigationContainer>
   );

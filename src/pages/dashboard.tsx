@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  container: {
+container: {
     paddingHorizontal: 20,
     alignItems: 'center',
     borderColor: 'red',
