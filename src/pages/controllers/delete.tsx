@@ -28,10 +28,10 @@ const ItemPage = () => {
     setDataBarang(urutanData);
   };
 
-  const handleDelete = async (kodeBarang: string) => {
+  const alertDelete = async (kodeBarang: string) => {
     Alert.alert(
       'Konfirmasi',     
-      'Apakah Anda yakin ingin menghapus data ini?',
+      'Apakah Anda yakin menghapus barang ini?',
       [
         {
           text: 'Batal',
@@ -55,7 +55,7 @@ const ItemPage = () => {
 
   const renderData = () => {
     if (dataBarang.length === 0) {
-      return <Text style={styles.emptyText}>Data Kosong</Text>;
+      return <Text style={styles.emptyText}>Data Barang Kosong</Text>;
     }
     return (
       <FlatList
@@ -67,7 +67,7 @@ const ItemPage = () => {
             <Text style={styles.tableData}>{item.namaBarang}</Text>
             <TouchableOpacity
               style={styles.deleteButton}
-              onPress={() => handleDelete(item.kodeBarang)}>
+              onPress={() => alertDelete(item.kodeBarang)}>
               <Text style={styles.deleteButtonText}>Hapus</Text>
             </TouchableOpacity>
           </View>
