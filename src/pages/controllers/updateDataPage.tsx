@@ -2,23 +2,24 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type RootStackParamList = {
-    updateDataPage: {
-      kodeBarang: string;
-      namaBarang: string;
-      hargaJual: string;
-      hargaAwal: string;
-    };
+  updateDataPage: {
+    kodeBarang: string;
+    namaBarang: string;
+    hargaJual: string;
+    hargaAwal: string;
   };
+};
 
 type UpdateDataPageRouteProp = RouteProp<RootStackParamList, 'updateDataPage'>;
-type UpdateDataPageNavigationProp = NativeStackNavigationProp<RootStackParamList, 'updateDataPage'>;  
+type UpdateDataPageNavigationProp = NativeStackNavigationProp<RootStackParamList, 'updateDataPage'>;
 
 type Props = {
-    route: UpdateDataPageRouteProp;
-    navigation: UpdateDataPageNavigationProp;
-  };
+  route: UpdateDataPageRouteProp;
+  navigation: UpdateDataPageNavigationProp;
+};
 
 const UpdateDataPage: React.FC<Props> = ({ route, navigation }) => {
   const { kodeBarang, namaBarang, hargaJual, hargaAwal } = route.params;
@@ -27,12 +28,36 @@ const UpdateDataPage: React.FC<Props> = ({ route, navigation }) => {
   const [updatedHargaJual, setUpdatedHargaJual] = useState(hargaJual);
   const [updatedHargaAwal, setUpdatedHargaAwal] = useState(hargaAwal);
 
-  const handleUpdateData = () => {
+  const handleUpdateData = async () => {
     if (!updatedKodeBarang || !updatedNamaBarang || !updatedHargaJual || !updatedHargaAwal) {
       Alert.alert('Error', 'Semua field harus diisi');
       return;
     }
-    Alert.alert('Sukses', 'Data berhasil diperbarui');
+
+    try {
+      const storedData = await AsyncStorage.getItem('dataBarang');
+      const parsedData = storedData ? JSON.parse(storedData) : [];
+
+      const updatedData = parsedData.map((item: any) => {
+        if (item.kodeBarang === kodeBarang) {
+          return {
+            ...item,
+            kodeBarang: updatedKodeBarang,
+            namaBarang: updatedNamaBarang,
+            hargaJual: updatedHargaJual,
+            hargaAwal: updatedHargaAwal,
+          };
+        }
+        return item;
+      });
+
+      await AsyncStorage.setItem('dataBarang', JSON.stringify(updatedData));
+
+      Alert.alert('Sukses', 'Data berhasil diperbarui');
+      navigation.goBack();
+    } catch (error) {
+      Alert.alert('Error', 'Terjadi kesalahan saat memperbarui data');
+    }
   };
 
   return (
