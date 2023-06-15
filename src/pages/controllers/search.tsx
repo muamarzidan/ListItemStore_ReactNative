@@ -1,7 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  TextInput,
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
 
 interface Barang {
   kodeBarang: string;
@@ -22,9 +28,13 @@ const ItemPage = () => {
   }, []);
 
   const getDataBarang = async () => {
-    const storedData = await AsyncStorage.getItem('dataBarang');
-    const parsedData = storedData ? JSON.parse(storedData) : [];
-    setDataBarang(parsedData);
+    try {
+      const storedData = await AsyncStorage.getItem('dataBarang');
+      const parsedData = storedData ? JSON.parse(storedData) : [];
+      setDataBarang(parsedData);
+    } catch (error) {
+      console.log('Error saat pengambilan data:', error);
+    }
   };
 
   const handlePrevPage = () => {
@@ -50,9 +60,10 @@ const ItemPage = () => {
   };
 
   const getPageData = () => {
-    const filteredData = dataBarang.filter((item) =>
-      item.kodeBarang.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-      item.namaBarang.toLowerCase().includes(searchKeyword.toLowerCase())
+    const filteredData = dataBarang.filter(
+      item =>
+        item.kodeBarang.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+        item.namaBarang.toLowerCase().includes(searchKeyword.toLowerCase()),
     );
 
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -83,7 +94,7 @@ const ItemPage = () => {
         keyExtractor={(item, index) => index.toString()}
         ItemSeparatorComponent={renderSeparator}
         contentContainerStyle={styles.tableContainer}
-        renderItem={({ item }) => (
+        renderItem={({item}) => (
           <View style={styles.tableRow}>
             <Text style={styles.tableData}>{item.kodeBarang}</Text>
             <Text style={styles.tableData}>{item.namaBarang}</Text>
@@ -94,11 +105,15 @@ const ItemPage = () => {
       />
 
       <View style={styles.paginationContainer}>
-        <TouchableOpacity style={styles.paginationButton} onPress={handlePrevPage}>
+        <TouchableOpacity
+          style={styles.paginationButton}
+          onPress={handlePrevPage}>
           <Text style={styles.paginationButtonText}>&lt;</Text>
         </TouchableOpacity>
         <Text style={styles.paginationText}>{currentPage}</Text>
-        <TouchableOpacity style={styles.paginationButton} onPress={handleNextPage}>
+        <TouchableOpacity
+          style={styles.paginationButton}
+          onPress={handleNextPage}>
           <Text style={styles.paginationButtonText}>&gt;</Text>
         </TouchableOpacity>
       </View>

@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  TextInput
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -17,15 +18,30 @@ interface Barang {
 
 const UpdatePage = ({navigation}: {navigation: any}) => {
   const [dataBarang, setDataBarang] = useState<Barang[]>([]);
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [filteredData, setFilteredData] = useState<Barang[]>([]);
 
   useEffect(() => {
     getDataBarang();
   }, []);
 
+  const handleSearch = (text: string) => {
+    setSearchKeyword(text);
+
+    const filteredData = dataBarang.filter(
+      item =>
+        item.kodeBarang.toLowerCase().includes(text.toLowerCase()) ||
+        item.namaBarang.toLowerCase().includes(text.toLowerCase()),
+    );
+
+    setFilteredData(filteredData);
+  };
+
   const getDataBarang = async () => {
     const storedData = await AsyncStorage.getItem('dataBarang');
     const parsedData = storedData ? JSON.parse(storedData) : [];
     setDataBarang(parsedData);
+    setFilteredData(parsedData);
   };
 
   const handleUpdateBarang = (
@@ -45,8 +61,14 @@ const UpdatePage = ({navigation}: {navigation: any}) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Data Barang</Text>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Cari barang..."
+          onChangeText={handleSearch}
+          value={searchKeyword}
+        />
       <ScrollView contentContainerStyle={styles.contentContainer}>
-        {dataBarang.map((item, index) => (
+        {filteredData.map((item, index) => (
           <View style={styles.tableRow} key={`${item.kodeBarang}-${index}`}>
             <Text style={styles.tableData}>{item.kodeBarang}</Text>
             <Text style={styles.tableData}>{item.namaBarang}</Text>
@@ -106,6 +128,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
+  searchInput: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+    borderRadius: 5, // Tambahkan styling untuk mengatur sudut border
+  },
+  
 });
 
 export default UpdatePage;
