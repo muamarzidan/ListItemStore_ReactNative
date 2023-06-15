@@ -1,7 +1,6 @@
-import React, {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, FlatList, TouchableOpacity, Alert} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, TextInput } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
 
 interface Barang {
   kodeBarang: string;
@@ -10,8 +9,9 @@ interface Barang {
   hargaAwal: string;
 }
 
-const ItemPage = () => {
+const DeletePage = () => {
   const [dataBarang, setDataBarang] = useState<Barang[]>([]);
+  const [searchKeyword, setSearchKeyword] = useState('');
 
   useEffect(() => {
     getDataBarang();
@@ -30,7 +30,7 @@ const ItemPage = () => {
 
   const alertDelete = async (kodeBarang: string) => {
     Alert.alert(
-      'Konfirmasi',     
+      'Konfirmasi',
       'Apakah Anda yakin menghapus barang ini?',
       [
         {
@@ -53,21 +53,33 @@ const ItemPage = () => {
     setDataBarang(newData);
   };
 
+  const handleSearch = (text: string) => {
+    setSearchKeyword(text);
+  };
+
   const renderData = () => {
-    if (dataBarang.length === 0) {
+    const filteredData = dataBarang.filter(
+      item =>
+        item.kodeBarang.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+        item.namaBarang.toLowerCase().includes(searchKeyword.toLowerCase())
+    );
+
+    if (filteredData.length === 0) {
       return <Text style={styles.emptyText}>Data Barang Kosong</Text>;
     }
+
     return (
       <FlatList
-        data={dataBarang}
+        data={filteredData}
         keyExtractor={(_, index) => index.toString()}
-        renderItem={({item}) => (
+        renderItem={({ item }) => (
           <View style={styles.tableRow}>
             <Text style={styles.tableData}>{item.kodeBarang}</Text>
             <Text style={styles.tableData}>{item.namaBarang}</Text>
             <TouchableOpacity
               style={styles.deleteButton}
-              onPress={() => alertDelete(item.kodeBarang)}>
+              onPress={() => alertDelete(item.kodeBarang)}
+            >
               <Text style={styles.deleteButtonText}>Hapus</Text>
             </TouchableOpacity>
           </View>
@@ -79,11 +91,20 @@ const ItemPage = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Data Barang</Text>
+
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Cari barang..."
+        onChangeText={handleSearch}
+        value={searchKeyword}
+      />
+
       <View style={styles.tableRow}>
         <Text style={styles.columnHeader}>Kode Barang</Text>
         <Text style={styles.columnHeader}>Nama Barang</Text>
         <Text style={styles.columnHeader}></Text>
       </View>
+
       {renderData()}
     </View>
   );
@@ -100,6 +121,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
+  },
+  searchInput: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+    borderRadius: 5,
   },
   tableRow: {
     flexDirection: 'row',
@@ -133,4 +162,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ItemPage;
+export default DeletePage;
