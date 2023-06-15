@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import Index from './src/index';
+import Item from './src/pages/itemPage';
 import Login from './src/pages/loginPage';
 import Daftar from './src/pages/registerPage';
 import Dashboard from './src/pages/dashboard';
@@ -18,9 +19,10 @@ function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="dashboardPage"
+        initialRouteName="indexPage"
         screenOptions={{ headerShown: false }}>
         <Stack.Screen name="indexPage" component={Index} />
+        <Stack.Screen name="itemPage" component={Item} />
         <Stack.Screen name="loginPage" component={Login} />
         <Stack.Screen name="registerPage" component={Daftar} />
         <Stack.Screen name="dashboardPage" component={Dashboard} />
