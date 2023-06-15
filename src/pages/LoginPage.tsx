@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { NavigationProp } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface AppProps {
@@ -10,6 +11,7 @@ interface AppProps {
 export default function LoginPage({ navigation }: AppProps) {
   const [namaToko, setNamaToko] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async () => {
     const storedNamaToko = await AsyncStorage.getItem('namaToko');
@@ -26,6 +28,10 @@ export default function LoginPage({ navigation }: AppProps) {
     navigation.navigate('registerPage');
   };
 
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
@@ -37,13 +43,18 @@ export default function LoginPage({ navigation }: AppProps) {
         value={namaToko}
       />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        onChangeText={setPassword}
-        value={password}
-        secureTextEntry
-      />
+      <View style={styles.passwordContainer}>
+        <TextInput
+          style={styles.passwordInput}
+          placeholder="Password"
+          onChangeText={setPassword}
+          value={password}
+          secureTextEntry={!showPassword}
+        />
+        <TouchableOpacity style={styles.passwordIcon} onPress={toggleShowPassword}>
+          <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={24} color="black" />
+        </TouchableOpacity>
+      </View>
 
       <TouchableOpacity onPress={handleRegister}>
         <Text style={styles.registerText}>Belum punya akun? Daftar disini</Text>
@@ -73,6 +84,21 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     marginBottom: 10,
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+  },
+  passwordInput: {
+    flex: 1,
+  },
+  passwordIcon: {
+    marginLeft: 10,
   },
   loginButton: {
     backgroundColor: 'blue',
