@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { NavigationProp } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface AppProps {
@@ -52,7 +52,7 @@ export default function LoginPage({ navigation }: AppProps) {
           secureTextEntry={!showPassword}
         />
         <TouchableOpacity style={styles.passwordIcon} onPress={toggleShowPassword}>
-          <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={24} color="black" />
+          <Icon name={showPassword ? 'eye-slash' : 'eye'} size={30} color="black" />
         </TouchableOpacity>
       </View>
 

@@ -88,6 +88,15 @@ def reactNativeArchitectures() {
     return value ? value.split(",") : ["armeabi-v7a", "x86", "x86_64", "arm64-v8a"]
 }
 
+project.ext.react = [
+    entryFile: "index.js",
+]
+
+project.ext.vectoricons = [
+    iconFontNames: ['FontAwesome.ttf']
+]
+apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
+
 android {
     ndkVersion rootProject.ext.ndkVersion
 
