@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { View, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
@@ -10,7 +9,8 @@ import Dashboard from './src/pages/dashboard';
 import FormCreate from './src/pages/controllers/create';
 import FormSearch from './src/pages/controllers/search';
 import FormDelete from './src/pages/controllers/delete';
-// import FormUpdate from './src/pages/controllers/update';
+import FormUpdate from './src/pages/controllers/update';
+import UpdateDataPage from './src/pages/controllers/updateDataPage';
 
 const Stack = createNativeStackNavigator();
 
@@ -27,6 +27,8 @@ function App() {
         <Stack.Screen name="createPage" component={FormCreate} />
         <Stack.Screen name="searchPage" component={FormSearch} />
         <Stack.Screen name="deletePage" component={FormDelete} />
+        <Stack.Screen name="updatePage" component={FormUpdate} />
+        <Stack.Screen name="updateDataPage" component={UpdateDataPage} />
       </Stack.Navigator>
     </NavigationContainer>
   );
