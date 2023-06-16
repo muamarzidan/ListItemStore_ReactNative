@@ -14,7 +14,7 @@ export default function RegisterPage({ navigation }: AppProps) {
 
   const handleRegister = () => {
     if (namaToko === '' || namaAdmin === '' || password === '') {
-      Alert.alert('Harap isi semua form terlebih dahulu');
+      Alert.alert('Harap isi form yang kosong terlebih dahulu');
       return;
     }
     AsyncStorage.setItem('namaToko', namaToko);

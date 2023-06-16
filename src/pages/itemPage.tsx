@@ -1,9 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { StackNavigationProp } from '@react-navigation/stack';
 
-const IndexBarangPage = ({ navigation }: { navigation: any }) => {
-  const [userData, setUserData] = useState<any>(null);
+// Ganti impor ini dengan definisi tipe manual jika Anda tidak memiliki modul 'types'
+type RootStackParamList = {
+  itemPage: undefined;
+  loginPage: undefined;
+};
+
+type ItemPageNavigationProp = StackNavigationProp<RootStackParamList, 'itemPage'>;
+
+interface ItemPageProps {
+  navigation: ItemPageNavigationProp;
+}
+
+const IndexBarangPage = ({ navigation }: ItemPageProps) => {
+  const [userData, setUserData] = useState<{ namaToko: string; namaAdmin: string; password: string } | null>(null);
   const [dataBarang, setDataBarang] = useState<any[]>([]);
 
   useEffect(() => {
@@ -12,9 +25,18 @@ const IndexBarangPage = ({ navigation }: { navigation: any }) => {
   }, []);
 
   const checkUser = async () => {
-    const storedData = await AsyncStorage.getItem('userData');
-    const parsedData = storedData ? JSON.parse(storedData) : null;
-    setUserData(parsedData);
+    const storedNamaToko = await AsyncStorage.getItem('namaToko');
+    const storedNamaAdmin = await AsyncStorage.getItem('namaAdmin');
+    const storedPassword = await AsyncStorage.getItem('password');
+
+    if (storedNamaToko && storedNamaAdmin && storedPassword) {
+      const userData = {
+        namaToko: storedNamaToko,
+        namaAdmin: storedNamaAdmin,
+        password: storedPassword,
+      };
+      setUserData(userData);
+    }
   };
 
   const getDataBarang = async () => {
@@ -28,7 +50,7 @@ const IndexBarangPage = ({ navigation }: { navigation: any }) => {
   };
 
   const handleCreateData = () => {
-    navigation.navigate('CreateDataPage');
+    navigation.navigate('loginPage');
   };
 
   const renderTable = () => {
@@ -38,10 +60,10 @@ const IndexBarangPage = ({ navigation }: { navigation: any }) => {
           <Text style={styles.columnHeader}>Kode Barang</Text>
           <Text style={styles.columnHeader}>Nama Barang</Text>
         </View>
-        {dataBarang.map((item, index) => (
-          <View style={styles.tableRow} key={`${item.kodeBarang}-${index}`}>
-            <Text style={styles.tableData}>{item.kodeBarang}</Text>
-            <Text style={styles.tableData}>{item.namaBarang}</Text>
+        {dataBarang.map((item: any, index: number) => (
+          <View style={styles.tableRow} key={`${item?.kodeBarang}-${index}`}>
+            <Text style={styles.tableData}>{item?.kodeBarang}</Text>
+            <Text style={styles.tableData}>{item?.namaBarang}</Text>
           </View>
         ))}
       </View>
@@ -52,16 +74,16 @@ const IndexBarangPage = ({ navigation }: { navigation: any }) => {
     if (!userData) {
       return (
         <View style={styles.contentContainer}>
-          <Text style={styles.emptyText}>Data kosong</Text>
+          <Text style={styles.emptyText}>Data kosong dan anda belum terdaftar</Text>
           <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-            <Text style={styles.buttonText}>Mau login?</Text>
+            <Text style={styles.buttonText}>Login terlebih dahulu</Text>
           </TouchableOpacity>
         </View>
       );
-    } else if (dataBarang.length === 0) {
+    } else if (userData !== null && dataBarang.length === 0) {
       return (
         <View style={styles.contentContainer}>
-          <Text style={styles.emptyText}>Data kosong, masukkan data terlebih dahulu</Text>
+          <Text style={styles.emptyText}>Belum ada data yang anda masukkan</Text>
           <TouchableOpacity style={styles.createButton} onPress={handleCreateData}>
             <Text style={styles.buttonText}>Masukkan Data</Text>
           </TouchableOpacity>
@@ -74,7 +96,7 @@ const IndexBarangPage = ({ navigation }: { navigation: any }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Data Barang Toko ...</Text>
+      <Text style={styles.title}>Data Barang Toko {userData?.namaToko}</Text>
       {renderContent()}
     </View>
   );

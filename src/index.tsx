@@ -1,13 +1,28 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { NavigationProp } from '@react-navigation/native';
-import React from 'react';
+import React, { useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import ButtonNormal from './components/button';
+
 interface AppProps {
   navigation: NavigationProp<any>;
 }
 
-export default function App({ navigation }: AppProps) { 
+export default function App({ navigation }: AppProps) {
+  useEffect(() => {
+    checkUserLoggedIn();
+  }, []);
+
+  const checkUserLoggedIn = async () => {
+    const storedNamaToko = await AsyncStorage.getItem('namaToko');
+    const storedPassword = await AsyncStorage.getItem('password');
+
+    if (storedNamaToko && storedPassword) {
+      navigation.navigate('dashboardPage');
+    }
+  };
+
   return (
     <View style={styles.main}>
       <View style={styles.container}>
@@ -50,5 +65,5 @@ const styles = StyleSheet.create({
     padding: 10,
     width: 150,
     borderRadius: 5,
-  }
+  },
 });
