@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { NavigationProp } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import AsyncStorage from '@react-native-async-storage/async-storage'; 4
+
 
 interface AppProps {
   navigation: NavigationProp<any>;
@@ -19,6 +20,8 @@ export default function LoginPage({ navigation }: AppProps) {
 
     if (namaToko === storedNamaToko && password === storedPassword) {
       navigation.navigate('dashboardPage');
+    } else if (namaToko === '' || password === '') {
+      Alert.alert('Harap isi form yang kosong terlebih dahulu')
     } else {
       Alert.alert('Nama toko atau password salah');
     }
@@ -37,7 +40,7 @@ export default function LoginPage({ navigation }: AppProps) {
       <Text style={styles.title}>Login</Text>
 
       <TextInput
-        style={styles.input}
+        style={styles.namaInput}
         placeholder="Nama Toko"
         onChangeText={setNamaToko}
         value={namaToko}
@@ -52,7 +55,7 @@ export default function LoginPage({ navigation }: AppProps) {
           secureTextEntry={!showPassword}
         />
         <TouchableOpacity style={styles.passwordIcon} onPress={toggleShowPassword}>
-          <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={24} color="black" />
+          <Icon name={showPassword ? 'eye-slash' : 'eye'} size={20} color="black" />
         </TouchableOpacity>
       </View>
 
@@ -78,7 +81,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
   },
-  input: {
+  namaInput: {
     borderWidth: 1,
     borderColor: 'gray',
     borderRadius: 5,
@@ -91,14 +94,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'gray',
     borderRadius: 5,
-    padding: 10,
+    padding: 1,
     marginBottom: 10,
   },
   passwordInput: {
     flex: 1,
   },
   passwordIcon: {
-    marginLeft: 10,
+    marginRight: 15,
   },
   loginButton: {
     backgroundColor: 'blue',

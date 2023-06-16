@@ -1,8 +1,46 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { NavigationProp } from '@react-navigation/native';
-import React from 'react';
+import React, { useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import ButtonNormal from './components/button';
+
+interface AppProps {
+  navigation: NavigationProp<any>;
+}
+
+export default function App({ navigation }: AppProps) {
+  useEffect(() => {
+    checkUserLoggedIn();
+  }, []);
+
+  const checkUserLoggedIn = async () => {
+    const storedNamaToko = await AsyncStorage.getItem('namaToko');
+    const storedPassword = await AsyncStorage.getItem('password');
+
+    if (storedNamaToko && storedPassword) {
+      navigation.navigate('dashboardPage');
+    }
+  };
+
+  return (
+    <View style={styles.main}>
+      <View style={styles.container}>
+        <Text style={styles.welcomeText}>Selamat datang di Toko Anda</Text>
+        <ButtonNormal
+          onPress={() => navigation.navigate('loginPage')}
+          title="Login"
+          buttonStyle={styles.button}
+        />
+        <ButtonNormal
+          onPress={() => navigation.navigate('itemPage')}
+          title="Cari Barang"
+          buttonStyle={styles.button}
+        />
+      </View>
+    </View>
+  );
+}
 
 const styles = StyleSheet.create({
   main: {
@@ -27,29 +65,5 @@ const styles = StyleSheet.create({
     padding: 10,
     width: 150,
     borderRadius: 5,
-  }
+  },
 });
-
-interface AppProps {
-  navigation: NavigationProp<any>;
-}
-
-export default function App({ navigation }: AppProps) { 
-  return (
-    <View style={styles.main}>
-      <View style={styles.container}>
-        <Text style={styles.welcomeText}>Selamat datang di Toko Anda</Text>
-        <ButtonNormal
-          onPress={() => navigation.navigate('loginPage')}
-          title="Login"
-          buttonStyle={styles.button}
-        />
-        <ButtonNormal
-          onPress={() => navigation.navigate('loginPage')}
-          title="Cari Barang"
-          buttonStyle={styles.button}
-        />
-      </View>
-    </View>
-  );
-}
