@@ -1,23 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {View, Text, StyleSheet, TouchableOpacity, TextInput} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { StackNavigationProp } from '@react-navigation/stack';
+import {StackNavigationProp} from '@react-navigation/stack';
 
-// Ganti impor ini dengan definisi tipe manual jika Anda tidak memiliki modul 'types'
 type RootStackParamList = {
   itemPage: undefined;
   loginPage: undefined;
 };
 
-type ItemPageNavigationProp = StackNavigationProp<RootStackParamList, 'itemPage'>;
+type ItemPageNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  'itemPage'
+>;
 
 interface ItemPageProps {
   navigation: ItemPageNavigationProp;
 }
 
-const IndexBarangPage = ({ navigation }: ItemPageProps) => {
-  const [userData, setUserData] = useState<{ namaToko: string; namaAdmin: string; password: string } | null>(null);
+const IndexBarangPage = ({navigation}: ItemPageProps) => {
+  const [userData, setUserData] = useState<{
+    namaToko: string;
+    namaAdmin: string;
+    password: string;
+  } | null>(null);
   const [dataBarang, setDataBarang] = useState<any[]>([]);
+  const [searchKeyword, setSearchKeyword] = useState('');
 
   useEffect(() => {
     checkUser();
@@ -45,6 +52,10 @@ const IndexBarangPage = ({ navigation }: ItemPageProps) => {
     setDataBarang(parsedData);
   };
 
+  const handleSearch = (keyword: string) => {
+    setSearchKeyword(keyword);
+  };
+
   const handleLogin = () => {
     navigation.navigate('loginPage');
   };
@@ -54,13 +65,19 @@ const IndexBarangPage = ({ navigation }: ItemPageProps) => {
   };
 
   const renderTable = () => {
+    const filteredData = dataBarang.filter((item: any) => {
+      const kodeBarang = item?.kodeBarang?.toLowerCase();
+      const namaBarang = item?.namaBarang?.toLowerCase();
+      const keyword = searchKeyword.toLowerCase();
+      return kodeBarang.includes(keyword) || namaBarang.includes(keyword);
+    });
     return (
       <View style={styles.tableContainer}>
         <View style={styles.tableRow}>
           <Text style={styles.columnHeader}>Kode Barang</Text>
           <Text style={styles.columnHeader}>Nama Barang</Text>
         </View>
-        {dataBarang.map((item: any, index: number) => (
+        {filteredData.map((item: any, index: number) => (
           <View style={styles.tableRow} key={`${item?.kodeBarang}-${index}`}>
             <Text style={styles.tableData}>{item?.kodeBarang}</Text>
             <Text style={styles.tableData}>{item?.namaBarang}</Text>
@@ -74,7 +91,9 @@ const IndexBarangPage = ({ navigation }: ItemPageProps) => {
     if (!userData) {
       return (
         <View style={styles.contentContainer}>
-          <Text style={styles.emptyText}>Data kosong dan anda belum terdaftar</Text>
+          <Text style={styles.emptyText}>
+            Data kosong dan anda belum terdaftar
+          </Text>
           <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
             <Text style={styles.buttonText}>Login terlebih dahulu</Text>
           </TouchableOpacity>
@@ -83,8 +102,12 @@ const IndexBarangPage = ({ navigation }: ItemPageProps) => {
     } else if (userData !== null && dataBarang.length === 0) {
       return (
         <View style={styles.contentContainer}>
-          <Text style={styles.emptyText}>Belum ada data yang anda masukkan</Text>
-          <TouchableOpacity style={styles.createButton} onPress={handleCreateData}>
+          <Text style={styles.emptyText}>
+            Belum ada data yang anda masukkan
+          </Text>
+          <TouchableOpacity
+            style={styles.createButton}
+            onPress={handleCreateData}>
             <Text style={styles.buttonText}>Masukkan Data</Text>
           </TouchableOpacity>
         </View>
@@ -97,6 +120,12 @@ const IndexBarangPage = ({ navigation }: ItemPageProps) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Data Barang Toko {userData?.namaToko}</Text>
+      <TextInput
+          style={styles.searchInput}
+          placeholder="Cari barang..."
+          value={searchKeyword}
+          onChangeText={handleSearch}
+        />
       {renderContent()}
     </View>
   );
@@ -143,6 +172,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
   },
+  searchInput: {
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginBottom: 10,
+    borderRadius: 5,
+  },  
   loginButton: {
     backgroundColor: 'blue',
     paddingVertical: 8,
