@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { NavigationProp } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-  
+import Icon from 'react-native-vector-icons/FontAwesome';
+
 interface AppProps {
   navigation: NavigationProp<any>;
 }
@@ -11,6 +12,7 @@ export default function RegisterPage({ navigation }: AppProps) {
   const [namaToko, setNamaToko] = useState('');
   const [namaAdmin, setNamaAdmin] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleRegister = () => {
     if (namaToko === '' || namaAdmin === '' || password === '') {
@@ -21,7 +23,7 @@ export default function RegisterPage({ navigation }: AppProps) {
     AsyncStorage.setItem('namaAdmin', namaAdmin);
     AsyncStorage.setItem('password', password);
 
-    //then return to dashboard page
+    // Then return to the dashboard page
     navigation.navigate('dashboardPage');
   };
 
@@ -47,13 +49,18 @@ export default function RegisterPage({ navigation }: AppProps) {
         value={namaAdmin}
       />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        onChangeText={setPassword}
-        value={password}
-        secureTextEntry
-      />
+      <View style={styles.passwordInput}>
+        <TextInput
+          style={styles.passwordField}
+          placeholder="Password"
+          onChangeText={setPassword}
+          value={password}
+          secureTextEntry={!showPassword}
+        />
+        <TouchableOpacity style={styles.eyeIcon} onPress={() => setShowPassword(!showPassword)}>
+          <Icon name={showPassword ? 'eye' : 'eye-slash'} size={20} color="gray" />
+        </TouchableOpacity>
+      </View>
 
       <TouchableOpacity onPress={handleLogin}>
         <Text style={styles.loginText}>Sudah punya akun? Login disini</Text>
@@ -65,7 +72,6 @@ export default function RegisterPage({ navigation }: AppProps) {
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -85,6 +91,21 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
   },
+  passwordInput: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+  },
+  passwordField: {
+    flex: 1,
+  },
+  eyeIcon: {
+    padding: 5,
+  },
   registerButton: {
     backgroundColor: 'green',
     paddingVertical: 10,
@@ -100,6 +121,5 @@ const styles = StyleSheet.create({
     color: 'blue',
     textDecorationLine: 'underline',
     marginBottom: 10,
-  }
+  },
 });
-    
