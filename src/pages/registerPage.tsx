@@ -11,7 +11,7 @@ export default function RegisterPage({ navigation }: AppProps) {
   const [namaToko, setNamaToko] = useState('');
   const [namaAdmin, setNamaAdmin] = useState('');
   const [password, setPassword] = useState('');
-
+  
   const handleRegister = () => {
     if (namaToko === '' || namaAdmin === '' || password === '') {
       Alert.alert('Harap isi form yang kosong terlebih dahulu');
