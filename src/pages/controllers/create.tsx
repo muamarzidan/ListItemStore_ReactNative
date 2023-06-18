@@ -8,25 +8,13 @@ import {
   Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import UUID from 'react-native-uuid';
+
 
 const CreatePage = () => {
   const [kodeBarang, setKodeBarang] = useState('');
   const [namaBarang, setNamaBarang] = useState('');
   const [hargaAwal, setHargaAwal] = useState('');
   const [hargaJual, setHargaJual] = useState('');
-  const [nextId, setNextId] = useState(1);
-
-  const getDataBarang = async () => {
-    try {
-      const storedData = await AsyncStorage.getItem('dataBarang');
-      const parsedData = storedData ? JSON.parse(storedData) : [];
-      const maxId = parsedData.reduce((max: number, item: { id: number }) => Math.max(max, item.id), 0);
-      setNextId(maxId + 1);
-    } catch (error) {
-      console.log('Error saat pengambilan data:', error);
-    }
-  };
 
   const handleSubmit = async () => {
     if (!kodeBarang || !namaBarang || !hargaAwal || !hargaJual) {
@@ -34,21 +22,20 @@ const CreatePage = () => {
       return;
     }
 
+    const hasilDataBarang = await AsyncStorage.getItem('dataBarang');
+    const dataBarang = hasilDataBarang ? JSON.parse(hasilDataBarang) : [];
+
     const barang = {
-      id: nextId,
+      id: dataBarang.length + 1,
       kodeBarang,
       namaBarang,
       hargaAwal,
       hargaJual,
     };
     console.log('Data barang:', barang);
-    const hasilDataBarang = await AsyncStorage.getItem('dataBarang');
-    const dataBarang = hasilDataBarang ? JSON.parse(hasilDataBarang) : [];
-
     dataBarang.push(barang);
     await AsyncStorage.setItem('dataBarang', JSON.stringify(dataBarang));
 
-    setNextId(nextId + 1);
     setKodeBarang('');
     setNamaBarang('');
     setHargaAwal('');

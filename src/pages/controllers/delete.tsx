@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, TextInput } 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Barang {
+  id: number;
   kodeBarang: string;
   namaBarang: string;
   hargaAwal: string;
@@ -25,10 +26,12 @@ const DeletePage = () => {
       const huruf2 = b.kodeBarang.charAt(2).toUpperCase();
       return huruf1.localeCompare(huruf2);
     });
+    console.log('before fun get', convertData);
+    console.log('after fun get', urutanData);
     setDataBarang(urutanData);
   };
 
-  const alertDelete = async (kodeBarang: string) => {
+  const alertDelete = async (id: number) => {
     Alert.alert(
       'Konfirmasi',
       'Apakah Anda yakin menghapus barang ini?',
@@ -40,17 +43,25 @@ const DeletePage = () => {
         {
           text: 'Hapus',
           style: 'destructive',
-          onPress: () => handleDeleteBarang(kodeBarang),
+          onPress: () => handleDeleteBarang(id),
         },
       ],
       { cancelable: true }
     );
   };
 
-  const handleDeleteBarang = async (kodeBarang: string) => {
-    const newData = dataBarang.filter(item => item.kodeBarang !== kodeBarang);
-    await AsyncStorage.setItem('dataBarang', JSON.stringify(newData));
-    setDataBarang(newData);
+  const handleDeleteBarang = async (id: number) => {
+    const newData = dataBarang.filter(item => item.id !== id);
+    const restoreData = newData.map((item, index) => {
+      return {
+        ...item,
+        id: index + 1,
+      };
+    });
+    console.log('before handle:', dataBarang);
+    console.log('after', restoreData);
+    await AsyncStorage.setItem('dataBarang', JSON.stringify(restoreData));
+    setDataBarang(restoreData);
   };
 
   const handleSearch = (text: string) => {
@@ -78,7 +89,7 @@ const DeletePage = () => {
             <Text style={styles.tableData}>{item.namaBarang}</Text>
             <TouchableOpacity
               style={styles.deleteButton}
-              onPress={() => alertDelete(item.kodeBarang)}
+              onPress={() => alertDelete(item.id)}
             >
               <Text style={styles.deleteButtonText}>Hapus</Text>
             </TouchableOpacity>
