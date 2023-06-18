@@ -13,6 +13,7 @@ export default function LoginPage({ navigation }: AppProps) {
   const [namaToko, setNamaToko] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  
 
   const handleLogin = async () => {
     const storedNamaToko = await AsyncStorage.getItem('namaToko');
@@ -23,7 +24,7 @@ export default function LoginPage({ navigation }: AppProps) {
     } else if (namaToko === '' || password === '') {
       Alert.alert('Harap isi form yang kosong terlebih dahulu')
     } else {
-      Alert.alert('Nama toko atau password salah');
+      Alert.alert('Nama toko atau password yang anda masukan salah');
     }
   };
 

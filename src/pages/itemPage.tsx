@@ -48,8 +48,8 @@ const IndexBarangPage = ({navigation}: ItemPageProps) => {
 
   const getDataBarang = async () => {
     const storedData = await AsyncStorage.getItem('dataBarang');
-    const parsedData = storedData ? JSON.parse(storedData) : [];
-    setDataBarang(parsedData);
+    const convertData = storedData ? JSON.parse(storedData) : [];
+    setDataBarang(convertData);
   };
 
   const handleSearch = (keyword: string) => {
@@ -87,7 +87,7 @@ const IndexBarangPage = ({navigation}: ItemPageProps) => {
     );
   };
 
-  const renderContent = () => {
+  const renderContent = () => { //learn more about cleancode
     if (!userData) {
       return (
         <View style={styles.contentContainer}>

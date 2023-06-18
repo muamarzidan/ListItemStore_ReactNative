@@ -19,13 +19,13 @@ export default function App({ navigation }: AppProps) {
 
   const getNamaToko = async () => {
     const storedNamaToko = await AsyncStorage.getItem('namaToko');
-    setNamaToko(storedNamaToko || '');
+    setNamaToko(storedNamaToko || ''); //should be more good
   };
 
   const handleLogout = () => {
     Alert.alert(
       'Konfirmasi Logout',
-      'Yakin akan logout? Nama toko, Admin, dan password akan terhapus. Anda harus daftar ulang lagi',
+      'Yakin akan logout? Nama toko, admin, dan password akan terhapus. Anda harus daftar ulang lagi',
       [
         {
           text: 'Cancel',

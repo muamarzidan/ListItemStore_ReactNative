@@ -40,7 +40,7 @@ const CreatePage = () => {
     Alert.alert('Data barang berhasil ditambahkan');
   };
 
-  // loop create
+  // loop create but not cantik
   const autoCreateData = async () => {
     for (let i = 0; i < 10; i++) {
       const asciiCode = 65 + i; 
@@ -49,7 +49,7 @@ const CreatePage = () => {
       const barang = {
         kodeBarang: `TJ${newChar}${i + 1}`,
         namaBarang: `Lampu Watt ${i + 1}`,
-        hargaAwal: `Rp.${i + 1000}`,
+        hargaJual: `Rp.${i + 1000}`,
         hargaJual: `Rp.${i + 1500}`,
       };
 
