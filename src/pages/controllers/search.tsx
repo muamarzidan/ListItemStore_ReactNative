@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -63,7 +63,7 @@ const ItemPage = () => {
     const filteredData = dataBarang.filter(
       item =>
         item.kodeBarang.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-        item.namaBarang.toLowerCase().includes(searchKeyword.toLowerCase()),
+        item.namaBarang.toLowerCase().includes(searchKeyword.toLowerCase())
     );
 
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -94,7 +94,7 @@ const ItemPage = () => {
         keyExtractor={(item, index) => index.toString()}
         ItemSeparatorComponent={renderSeparator}
         contentContainerStyle={styles.tableContainer}
-        renderItem={({item}) => (
+        renderItem={({ item }) => (
           <View style={styles.tableRow}>
             <Text style={styles.tableData}>{item.kodeBarang}</Text>
             <Text style={styles.tableData}>{item.namaBarang}</Text>
@@ -104,16 +104,25 @@ const ItemPage = () => {
         )}
       />
 
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => console.log(dataBarang)}
+      >
+        <Text style={styles.buttonText}>Tampilkan Data</Text>
+      </TouchableOpacity>
+
       <View style={styles.paginationContainer}>
         <TouchableOpacity
           style={styles.paginationButton}
-          onPress={handlePrevPage}>
+          onPress={handlePrevPage}
+        >
           <Text style={styles.paginationButtonText}>&lt;</Text>
         </TouchableOpacity>
         <Text style={styles.paginationText}>{currentPage}</Text>
         <TouchableOpacity
           style={styles.paginationButton}
-          onPress={handleNextPage}>
+          onPress={handleNextPage}
+        >
           <Text style={styles.paginationButtonText}>&gt;</Text>
         </TouchableOpacity>
       </View>
@@ -185,6 +194,19 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 10,
     marginRight: 10,
+  },
+  button: {
+    backgroundColor: 'blue',
+    borderRadius: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginTop: 20,
+    alignSelf: 'center',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

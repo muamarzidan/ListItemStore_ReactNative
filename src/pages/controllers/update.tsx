@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,13 +10,14 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Barang {
+  id: number;
   kodeBarang: string;
   namaBarang: string;
   hargaJual: string;
   hargaAwal: string;
 }
 
-const UpdatePage = ({navigation}: {navigation: any}) => {
+const UpdatePage = ({ navigation }: { navigation: any }) => {
   const [dataBarang, setDataBarang] = useState<Barang[]>([]);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [filteredData, setFilteredData] = useState<Barang[]>([]);
@@ -39,18 +40,20 @@ const UpdatePage = ({navigation}: {navigation: any}) => {
 
   const getDataBarang = async () => {
     const storedData = await AsyncStorage.getItem('dataBarang');
-    const parsedData = storedData ? JSON.parse(storedData) : [];
-    setDataBarang(parsedData);
-    setFilteredData(parsedData);
+    const convertData = storedData ? JSON.parse(storedData) : [];
+    setDataBarang(convertData);
+    setFilteredData(convertData);
   };
 
   const handleUpdateBarang = (
+    id: number,
     kodeBarang: string,
     namaBarang: string,
     hargaAwal: string,
     hargaJual: string,
   ) => {
     navigation.navigate('updateDataPage', {
+      id,
       kodeBarang,
       namaBarang,
       hargaAwal,
@@ -61,21 +64,22 @@ const UpdatePage = ({navigation}: {navigation: any}) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Data Barang</Text>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Cari barang..."
-          onChangeText={handleSearch}
-          value={searchKeyword}
-        />
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Cari barang..."
+        onChangeText={handleSearch}
+        value={searchKeyword}
+      />
       <ScrollView contentContainerStyle={styles.contentContainer}>
-        {filteredData.map((item, index) => (
-          <View style={styles.tableRow} key={`${item.kodeBarang}-${index}`}>
+        {filteredData.map((item) => (
+          <View style={styles.tableRow} key={item.id.toString()}>
             <Text style={styles.tableData}>{item.kodeBarang}</Text>
             <Text style={styles.tableData}>{item.namaBarang}</Text>
             <TouchableOpacity
               style={styles.updateButton}
               onPress={() =>
                 handleUpdateBarang(
+                  item.id,
                   item.kodeBarang,
                   item.namaBarang,
                   item.hargaAwal,
@@ -134,9 +138,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 10,
     paddingHorizontal: 10,
-    borderRadius: 5, // Tambahkan styling untuk mengatur sudut border
+    borderRadius: 5,
   },
-  
 });
 
 export default UpdatePage;

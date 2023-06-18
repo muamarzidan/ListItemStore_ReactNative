@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type RootStackParamList = {
   updateDataPage: {
+    id: number;
     kodeBarang: string;
     namaBarang: string;
     hargaAwal: string;
@@ -22,7 +23,7 @@ type Props = {
 };
 
 const UpdateDataPage: React.FC<Props> = ({ route, navigation }) => {
-  const { kodeBarang, namaBarang, hargaJual, hargaAwal } = route.params;
+  const { id, kodeBarang, namaBarang, hargaJual, hargaAwal } = route.params;
   const [updatedKodeBarang, setUpdatedKodeBarang] = useState(kodeBarang);
   const [updatedNamaBarang, setUpdatedNamaBarang] = useState(namaBarang);
   const [updatedHargaJual, setUpdatedHargaJual] = useState(hargaJual);
@@ -34,12 +35,21 @@ const UpdateDataPage: React.FC<Props> = ({ route, navigation }) => {
       return;
     }
 
-    try {
-      const storedData = await AsyncStorage.getItem('dataBarang');
-      const convertData = storedData ? JSON.parse(storedData) : [];
+    const storedData = await AsyncStorage.getItem('dataBarang');
+    const convertData = storedData ? JSON.parse(storedData) : [];
 
+    const isKodeBarangUsed = convertData.some(
+      (item: any) => item.kodeBarang === updatedKodeBarang && item.kodeBarang !== kodeBarang
+    );
+
+    if (isKodeBarangUsed) {
+      Alert.alert('Error', 'Kode barang sudah digunakan');
+      return;
+    }
+
+    try {
       const updatedData = convertData.map((item: any) => {
-        if (item.kodeBarang === kodeBarang) {
+        if (item.id === id) {
           return {
             ...item,
             kodeBarang: updatedKodeBarang,
@@ -50,9 +60,9 @@ const UpdateDataPage: React.FC<Props> = ({ route, navigation }) => {
         }
         return item;
       });
-
+  
       await AsyncStorage.setItem('dataBarang', JSON.stringify(updatedData));
-
+  
       Alert.alert('Sukses', 'Data berhasil diperbarui');
       navigation.goBack();
     } catch (error) {
