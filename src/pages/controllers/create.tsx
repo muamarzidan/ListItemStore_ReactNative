@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,12 +8,25 @@ import {
   Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import UUID from 'react-native-uuid';
 
 const CreatePage = () => {
   const [kodeBarang, setKodeBarang] = useState('');
   const [namaBarang, setNamaBarang] = useState('');
   const [hargaAwal, setHargaAwal] = useState('');
   const [hargaJual, setHargaJual] = useState('');
+  const [nextId, setNextId] = useState(1);
+
+  const getDataBarang = async () => {
+    try {
+      const storedData = await AsyncStorage.getItem('dataBarang');
+      const parsedData = storedData ? JSON.parse(storedData) : [];
+      const maxId = parsedData.reduce((max: number, item: { id: number }) => Math.max(max, item.id), 0);
+      setNextId(maxId + 1);
+    } catch (error) {
+      console.log('Error saat pengambilan data:', error);
+    }
+  };
 
   const handleSubmit = async () => {
     if (!kodeBarang || !namaBarang || !hargaAwal || !hargaJual) {
@@ -22,53 +35,26 @@ const CreatePage = () => {
     }
 
     const barang = {
+      id: nextId,
       kodeBarang,
       namaBarang,
       hargaAwal,
       hargaJual,
     };
+    console.log('Data barang:', barang);
     const hasilDataBarang = await AsyncStorage.getItem('dataBarang');
     const dataBarang = hasilDataBarang ? JSON.parse(hasilDataBarang) : [];
 
     dataBarang.push(barang);
     await AsyncStorage.setItem('dataBarang', JSON.stringify(dataBarang));
 
+    setNextId(nextId + 1);
     setKodeBarang('');
     setNamaBarang('');
     setHargaAwal('');
     setHargaJual('');
     Alert.alert('Data barang berhasil ditambahkan');
   };
-
-  // loop create but not cantik
-  const autoCreateData = async () => {
-    for (let i = 0; i < 10; i++) {
-      const asciiCode = 65 + i; 
-      const newChar = String.fromCharCode(asciiCode);
-
-      const barang = {
-        kodeBarang: `TJ${newChar}${i + 1}`,
-        namaBarang: `Lampu Watt ${i + 1}`,
-        hargaJual: `Rp.${i + 1000}`,
-        hargaJual: `Rp.${i + 1500}`,
-      };
-
-      const hasilDataBarang = await AsyncStorage.getItem('dataBarang');
-      const dataBarang = hasilDataBarang ? JSON.parse(hasilDataBarang) : [];
-
-      dataBarang.push(barang);
-      await AsyncStorage.setItem('dataBarang', JSON.stringify(dataBarang));
-    }
-
-    Alert.alert('Data barang berhasil dibuat secara otomatis');
-  };
-
-  useEffect(() => {
-    const isTesting = true;
-    if (isTesting) {
-      autoCreateData();
-    }
-  }, []);
 
   return (
     <View style={styles.container}>
