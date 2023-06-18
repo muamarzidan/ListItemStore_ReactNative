@@ -23,7 +23,7 @@ export default function RegisterPage({ navigation }: AppProps) {
     AsyncStorage.setItem('namaAdmin', namaAdmin);
     AsyncStorage.setItem('password', password);
 
-    // Then return to the dashboard page
+    // Then return to dashboard
     navigation.navigate('dashboardPage');
   };
 

@@ -85,8 +85,8 @@ const ItemPage = () => {
       <View style={styles.tableRow}>
         <Text style={styles.columnHeader}>Kode Barang</Text>
         <Text style={styles.columnHeader}>Nama Barang</Text>
-        <Text style={styles.columnHeader}>Harga Jual</Text>
         <Text style={styles.columnHeader}>Harga Awal</Text>
+        <Text style={styles.columnHeader}>Harga Jual</Text>
       </View>
 
       <FlatList
@@ -98,8 +98,8 @@ const ItemPage = () => {
           <View style={styles.tableRow}>
             <Text style={styles.tableData}>{item.kodeBarang}</Text>
             <Text style={styles.tableData}>{item.namaBarang}</Text>
-            <Text style={styles.tableData}>{item.hargaJual}</Text>
             <Text style={styles.tableData}>{item.hargaAwal}</Text>
+            <Text style={styles.tableData}>{item.hargaJual}</Text>
           </View>
         )}
       />

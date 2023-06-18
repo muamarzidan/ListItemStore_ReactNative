@@ -23,7 +23,7 @@ export default function LoginPage({ navigation }: AppProps) {
     } else if (namaToko === '' || password === '') {
       Alert.alert('Harap isi form yang kosong terlebih dahulu')
     } else {
-      Alert.alert('Nama toko atau password salah');
+      Alert.alert('Nama toko atau password yang anda masukan salah');
     }
   };
 

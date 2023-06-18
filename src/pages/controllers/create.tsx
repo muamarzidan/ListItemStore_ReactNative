@@ -40,7 +40,7 @@ const CreatePage = () => {
     Alert.alert('Data barang berhasil ditambahkan');
   };
 
-  // loop create
+  // loop create but not cantik
   const autoCreateData = async () => {
     for (let i = 0; i < 10; i++) {
       const asciiCode = 65 + i; 

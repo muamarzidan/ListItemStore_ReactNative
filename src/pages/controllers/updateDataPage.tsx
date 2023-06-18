@@ -8,8 +8,8 @@ type RootStackParamList = {
   updateDataPage: {
     kodeBarang: string;
     namaBarang: string;
-    hargaJual: string;
     hargaAwal: string;
+    hargaJual: string;
   };
 };
 
@@ -36,16 +36,16 @@ const UpdateDataPage: React.FC<Props> = ({ route, navigation }) => {
 
     try {
       const storedData = await AsyncStorage.getItem('dataBarang');
-      const parsedData = storedData ? JSON.parse(storedData) : [];
+      const convertData = storedData ? JSON.parse(storedData) : [];
 
-      const updatedData = parsedData.map((item: any) => {
+      const updatedData = convertData.map((item: any) => {
         if (item.kodeBarang === kodeBarang) {
           return {
             ...item,
             kodeBarang: updatedKodeBarang,
             namaBarang: updatedNamaBarang,
-            hargaJual: updatedHargaJual,
             hargaAwal: updatedHargaAwal,
+            hargaJual: updatedHargaJual,
           };
         }
         return item;
@@ -77,18 +77,18 @@ const UpdateDataPage: React.FC<Props> = ({ route, navigation }) => {
         onChangeText={setUpdatedNamaBarang}
       />
 
-      <Text style={styles.label}>Harga Jual</Text>
-      <TextInput
-        style={styles.input}
-        value={updatedHargaJual}
-        onChangeText={setUpdatedHargaJual}
-      />
-
       <Text style={styles.label}>Harga Awal</Text>
       <TextInput
         style={styles.input}
         value={updatedHargaAwal}
         onChangeText={setUpdatedHargaAwal}
+      />
+
+      <Text style={styles.label}>Harga Jual</Text>
+      <TextInput
+        style={styles.input}
+        value={updatedHargaJual}
+        onChangeText={setUpdatedHargaJual}
       />
 
       <TouchableOpacity style={styles.updateButton} onPress={handleUpdateData}>

@@ -5,8 +5,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 interface Barang {
   kodeBarang: string;
   namaBarang: string;
-  hargaJual: string;
   hargaAwal: string;
+  hargaJual: string;
 }
 
 const DeletePage = () => {
@@ -19,8 +19,8 @@ const DeletePage = () => {
 
   const getDataBarang = async () => {
     const storedData = await AsyncStorage.getItem('dataBarang');
-    const parsedData = storedData ? JSON.parse(storedData) : [];
-    const urutanData = parsedData.sort((a: Barang, b: Barang) => {
+    const convertData  = storedData ? JSON.parse(storedData) : [];
+    const urutanData = convertData .sort((a: Barang, b: Barang) => {
       const huruf1 = a.kodeBarang.charAt(2).toUpperCase();
       const huruf2 = b.kodeBarang.charAt(2).toUpperCase();
       return huruf1.localeCompare(huruf2);
