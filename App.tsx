@@ -12,6 +12,7 @@ import FormSearch from './src/pages/controllers/search';
 import FormDelete from './src/pages/controllers/delete';
 import FormUpdate from './src/pages/controllers/update';
 import UpdateDataPage from './src/pages/controllers/updateDataPage';
+import CheckoutPage from './src/pages/checkoutPage';
 
 const Stack = createNativeStackNavigator();
 
@@ -30,6 +31,7 @@ function App() {
         <Stack.Screen name="searchPage" component={FormSearch} />
         <Stack.Screen name="deletePage" component={FormDelete} />
         <Stack.Screen name="updatePage" component={FormUpdate} />
+        <Stack.Screen name="checkoutPage" component={CheckoutPage} />
         <Stack.Screen name="updateDataPage" component={UpdateDataPage} />
       </Stack.Navigator>
     </NavigationContainer>

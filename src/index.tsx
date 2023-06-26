@@ -36,6 +36,11 @@ export default function App({ navigation }: AppProps) {
           title="Cari Barang"
           buttonStyle={styles.button}
         />
+        <ButtonNormal
+          onPress={() => navigation.navigate('checkoutPage')}
+          title="Checkout"
+          buttonStyle={styles.button}
+        />
       </View>
     </View>
   );
