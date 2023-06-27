@@ -1,7 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+  Modal,
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { StackNavigationProp } from '@react-navigation/stack';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {AntDesign} from '@expo/vector-icons';
+import {RouteProp} from '@react-navigation/native';
 
 type RootStackParamList = {
   itemPage: undefined;
@@ -13,11 +22,14 @@ type ItemPageNavigationProp = StackNavigationProp<
   'itemPage'
 >;
 
+type ItemPageRouteProp = RouteProp<RootStackParamList, 'itemPage'>;
+
 interface ItemPageProps {
   navigation: ItemPageNavigationProp;
+  route: ItemPageRouteProp;
 }
 
-const CheckoutPage = ({ navigation }: ItemPageProps) => {
+const CheckoutPage: React.FC<ItemPageProps> = ({navigation, route}) => {
   const [userData, setUserData] = useState<{
     namaToko: string;
     namaAdmin: string;
@@ -25,10 +37,14 @@ const CheckoutPage = ({ navigation }: ItemPageProps) => {
   } | null>(null);
   const [dataBarang, setDataBarang] = useState<any[]>([]);
   const [searchKeyword, setSearchKeyword] = useState('');
+  const [keranjang, setKeranjang] = useState<any[]>([]);
+  const [totalItems, setTotalItems] = useState(0);
+  const [keranjangVisible, setKeranjangVisible] = useState(false);
 
   useEffect(() => {
     checkUser();
     getDataBarang();
+    getDataKeranjang();
   }, []);
 
   const checkUser = async () => {
@@ -47,9 +63,26 @@ const CheckoutPage = ({ navigation }: ItemPageProps) => {
   };
 
   const getDataBarang = async () => {
-    const storedData = await AsyncStorage.getItem('dataBarang');
-    const convertData = storedData ? JSON.parse(storedData) : [];
-    setDataBarang(convertData);
+    try {
+      const storedData = await AsyncStorage.getItem('dataBarang');
+      const convertData = storedData ? JSON.parse(storedData) : [];
+      setDataBarang(convertData);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getDataKeranjang = async () => {
+    try {
+      const storedKeranjang = await AsyncStorage.getItem('keranjang');
+      const convertKeranjang = storedKeranjang
+        ? JSON.parse(storedKeranjang)
+        : [];
+      setKeranjang(convertKeranjang);
+      setTotalItems(convertKeranjang.length);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleSearch = (keyword: string) => {
@@ -64,6 +97,25 @@ const CheckoutPage = ({ navigation }: ItemPageProps) => {
     navigation.navigate('loginPage');
   };
 
+  const handleAddToCart = async (item: any) => {
+    try {
+      const updatedKeranjang = [...keranjang, item];
+      await AsyncStorage.setItem('keranjang', JSON.stringify(updatedKeranjang));
+      setKeranjang(updatedKeranjang);
+      setTotalItems(updatedKeranjang.length);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleOpenModal = () => {
+    setKeranjangVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setKeranjangVisible(false);
+  };
+
   const renderTable = () => {
     const filteredData = dataBarang.filter((item: any) => {
       const kodeBarang = item?.kodeBarang?.toLowerCase();
@@ -74,15 +126,41 @@ const CheckoutPage = ({ navigation }: ItemPageProps) => {
     return (
       <View style={styles.tableContainer}>
         <View style={styles.tableRow}>
-          <Text style={styles.columnHeader}>Kode Barang</Text>
-          <Text style={styles.columnHeader}>Nama Barang</Text>
+          <Text style={styles.columnHeader}>Kode</Text>
+          <Text style={styles.columnHeader}>Nama</Text>
+          <Text style={styles.columnHeader}>Harga</Text>
+          <Text style={styles.columnHeader}>Aksi</Text>
         </View>
         {filteredData.map((item: any, index: number) => (
           <View style={styles.tableRow} key={`${item?.kodeBarang}-${index}`}>
             <Text style={styles.tableData}>{item?.kodeBarang}</Text>
             <Text style={styles.tableData}>{item?.namaBarang}</Text>
+            <Text style={styles.tableData}>{item?.hargaJual}</Text>
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={() => handleAddToCart(item)}>
+              <Text style={styles.addButtonLabel}>Tambah</Text>
+            </TouchableOpacity>
           </View>
         ))}
+      </View>
+    );
+  };
+
+  const renderModalContent = () => {
+    return (
+      <View style={styles.modalContent}>
+        <Text style={styles.modalTitle}>Keranjang Belanja</Text>
+        <View style={styles.cartItems}>
+          {keranjang.map((item: any, index: number) => (
+            <View style={styles.cartItem} key={`${item?.kodeBarang}-${index}`}>
+              <Text style={styles.cartItemText}>{item?.namaBarang}</Text>
+            </View>
+          ))}
+        </View>
+        <TouchableOpacity style={styles.closeButton} onPress={handleCloseModal}>
+          <Text style={styles.closeButtonText}>Tutup</Text>
+        </TouchableOpacity>
       </View>
     );
   };
@@ -102,11 +180,12 @@ const CheckoutPage = ({ navigation }: ItemPageProps) => {
     } else if (userData !== null && dataBarang.length === 0) {
       return (
         <View style={styles.contentContainer}>
-          <Text style={styles.emptyText}>Belum ada data yang Anda masukkan</Text>
+          <Text style={styles.emptyText}>
+            Belum ada data yang Anda masukkan
+          </Text>
           <TouchableOpacity
             style={styles.createButton}
-            onPress={handleCreateData}
-          >
+            onPress={handleCreateData}>
             <Text style={styles.buttonText}>Masukkan Data</Text>
           </TouchableOpacity>
         </View>
@@ -126,6 +205,21 @@ const CheckoutPage = ({ navigation }: ItemPageProps) => {
         onChangeText={handleSearch}
       />
       {renderContent()}
+
+      {totalItems > 0 && (
+        <TouchableOpacity
+          style={styles.keranjangIcon}
+          onPress={handleOpenModal}>
+          <AntDesign name="shoppingcart" size={24} color="white" />
+          <View style={styles.keranjangBadge}>
+            <Text style={styles.keranjangBadgeText}>{totalItems}</Text>
+          </View>
+        </TouchableOpacity>
+      )}
+
+      <Modal visible={keranjangVisible} animationType="fade" transparent={true}>
+        <View style={styles.modalContainer}>{renderModalContent()}</View>
+      </Modal>
     </View>
   );
 };
@@ -133,14 +227,20 @@ const CheckoutPage = ({ navigation }: ItemPageProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 5,
+    padding: 16,
   },
   title: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
+    marginBottom: 16,
+  },
+  searchInput: {
+    height: 40,
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    marginBottom: 16,
   },
   contentContainer: {
     flex: 1,
@@ -149,50 +249,112 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
+    marginBottom: 16,
+  },
+  loginButton: {
+    backgroundColor: 'blue',
+    padding: 8,
+    borderRadius: 8,
+  },
+  createButton: {
+    backgroundColor: 'green',
+    padding: 8,
+    borderRadius: 8,
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 20,
   },
   tableContainer: {
     flex: 1,
   },
   tableRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
+    alignItems: 'center',
+    marginBottom: 8,
   },
   columnHeader: {
     flex: 1,
-    fontSize: 16,
     fontWeight: 'bold',
-    textAlign: 'center',
   },
   tableData: {
     flex: 1,
-    fontSize: 16,
-    textAlign: 'center',
   },
-  searchInput: {
-    backgroundColor: '#ffffff',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    marginBottom: 10,
-    borderRadius: 5,
-  },
-  loginButton: {
-    backgroundColor: 'blue',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 5,
-  },
-  createButton: {
+  addButton: {
     backgroundColor: 'green',
     paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 5,
+    borderRadius: 4,
   },
-  buttonText: {
+  addButtonLabel: {
     color: 'white',
-    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  keranjangIcon: {
+    position: 'absolute',
+    bottom: 16,
+    right: 16,
+    backgroundColor: 'green',
+    borderRadius: 16,
+    padding: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  keranjangBadge: {
+    backgroundColor: 'red',
+    borderRadius: 16,
+    width: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 8,
+  },
+  keranjangBadgeText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  cartItems: {
+    maxHeight: 200,
+    marginBottom: 16,
+  },
+  cartItem: {
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 4,
+    marginBottom: 8,
+    width: '100%',
+  },
+  cartItemText: {
+    fontWeight: 'bold',
+  },
+  closeButton: {
+    backgroundColor: 'red',
+    padding: 8,
+    borderRadius: 8,
+  },
+  closeButtonText: {
+    color: 'white',
     fontWeight: 'bold',
     textAlign: 'center',
   },
