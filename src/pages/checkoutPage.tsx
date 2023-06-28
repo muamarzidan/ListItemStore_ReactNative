@@ -1,27 +1,17 @@
-import React, {useState, useEffect} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  Modal,
-} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Modal, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {StackNavigationProp} from '@react-navigation/stack';
-import {AntDesign} from '@expo/vector-icons';
-import {RouteProp} from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RouteProp } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/AntDesign';
+
 
 type RootStackParamList = {
   itemPage: undefined;
   loginPage: undefined;
 };
 
-type ItemPageNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  'itemPage'
->;
-
+type ItemPageNavigationProp = StackNavigationProp<RootStackParamList, 'itemPage'>;
 type ItemPageRouteProp = RouteProp<RootStackParamList, 'itemPage'>;
 
 interface ItemPageProps {
@@ -29,38 +19,27 @@ interface ItemPageProps {
   route: ItemPageRouteProp;
 }
 
-const CheckoutPage: React.FC<ItemPageProps> = ({navigation, route}) => {
-  const [userData, setUserData] = useState<{
-    namaToko: string;
-    namaAdmin: string;
-    password: string;
-  } | null>(null);
-  const [dataBarang, setDataBarang] = useState<any[]>([]);
+interface BarangItem {
+  kodeBarang: string;
+  namaBarang: string;
+  hargaJual: number;
+}
+
+interface KeranjangItem extends BarangItem {
+  quantity: number;
+}
+
+const CheckoutPage: React.FC<ItemPageProps> = ({ navigation, route }) => {
+  const [dataBarang, setDataBarang] = useState<BarangItem[]>([]);
   const [searchKeyword, setSearchKeyword] = useState('');
-  const [keranjang, setKeranjang] = useState<any[]>([]);
+  const [keranjang, setKeranjang] = useState<KeranjangItem[]>([]);
   const [totalItems, setTotalItems] = useState(0);
   const [keranjangVisible, setKeranjangVisible] = useState(false);
 
   useEffect(() => {
-    checkUser();
     getDataBarang();
     getDataKeranjang();
   }, []);
-
-  const checkUser = async () => {
-    const storedNamaToko = await AsyncStorage.getItem('namaToko');
-    const storedNamaAdmin = await AsyncStorage.getItem('namaAdmin');
-    const storedPassword = await AsyncStorage.getItem('password');
-
-    if (storedNamaToko && storedNamaAdmin && storedPassword) {
-      const userData = {
-        namaToko: storedNamaToko,
-        namaAdmin: storedNamaAdmin,
-        password: storedPassword,
-      };
-      setUserData(userData);
-    }
-  };
 
   const getDataBarang = async () => {
     try {
@@ -75,9 +54,7 @@ const CheckoutPage: React.FC<ItemPageProps> = ({navigation, route}) => {
   const getDataKeranjang = async () => {
     try {
       const storedKeranjang = await AsyncStorage.getItem('keranjang');
-      const convertKeranjang = storedKeranjang
-        ? JSON.parse(storedKeranjang)
-        : [];
+      const convertKeranjang = storedKeranjang ? JSON.parse(storedKeranjang) : [];
       setKeranjang(convertKeranjang);
       setTotalItems(convertKeranjang.length);
     } catch (error) {
@@ -89,137 +66,119 @@ const CheckoutPage: React.FC<ItemPageProps> = ({navigation, route}) => {
     setSearchKeyword(keyword);
   };
 
-  const handleLogin = () => {
-    navigation.navigate('loginPage');
-  };
-
-  const handleCreateData = () => {
-    navigation.navigate('loginPage');
-  };
-
-  const handleAddToCart = async (item: any) => {
+  const handleAddToCart = async (item: BarangItem) => {
     try {
-      const updatedKeranjang = [...keranjang, item];
-      await AsyncStorage.setItem('keranjang', JSON.stringify(updatedKeranjang));
-      setKeranjang(updatedKeranjang);
-      setTotalItems(updatedKeranjang.length);
+      const existingItem = keranjang.find((cartItem) => cartItem.kodeBarang === item.kodeBarang);
+
+      if (existingItem) {
+        const updatedKeranjang = keranjang.map((cartItem) => {
+          if (cartItem.kodeBarang === item.kodeBarang) {
+            return {
+              ...cartItem,
+              quantity: cartItem.quantity + 1,
+            };
+          }
+          return cartItem;
+        });
+        setKeranjang(updatedKeranjang);
+        await AsyncStorage.setItem('keranjang', JSON.stringify(updatedKeranjang));
+      } else {
+        const updatedKeranjang = [...keranjang, { ...item, quantity: 1 }];
+        setKeranjang(updatedKeranjang);
+        await AsyncStorage.setItem('keranjang', JSON.stringify(updatedKeranjang));
+      }
+
+      setTotalItems((prevTotal) => prevTotal + 1);
     } catch (error) {
       console.log(error);
     }
   };
 
-  const handleOpenModal = () => {
-    setKeranjangVisible(true);
-  };
+  const handleRemoveFromCart = async (item: BarangItem) => {
+    try {
+      const updatedKeranjang = keranjang.map((cartItem) => {
+        if (cartItem.kodeBarang === item.kodeBarang) {
+          return {
+            ...cartItem,
+            quantity: cartItem.quantity - 1,
+          };
+        }
+        return cartItem;
+      });
 
-  const handleCloseModal = () => {
-    setKeranjangVisible(false);
-  };
+      const filteredKeranjang = updatedKeranjang.filter((cartItem) => cartItem.quantity > 0);
 
-  const renderTable = () => {
-    const filteredData = dataBarang.filter((item: any) => {
-      const kodeBarang = item?.kodeBarang?.toLowerCase();
-      const namaBarang = item?.namaBarang?.toLowerCase();
-      const keyword = searchKeyword.toLowerCase();
-      return kodeBarang.includes(keyword) || namaBarang.includes(keyword);
-    });
-    return (
-      <View style={styles.tableContainer}>
-        <View style={styles.tableRow}>
-          <Text style={styles.columnHeader}>Kode</Text>
-          <Text style={styles.columnHeader}>Nama</Text>
-          <Text style={styles.columnHeader}>Harga</Text>
-          <Text style={styles.columnHeader}>Aksi</Text>
-        </View>
-        {filteredData.map((item: any, index: number) => (
-          <View style={styles.tableRow} key={`${item?.kodeBarang}-${index}`}>
-            <Text style={styles.tableData}>{item?.kodeBarang}</Text>
-            <Text style={styles.tableData}>{item?.namaBarang}</Text>
-            <Text style={styles.tableData}>{item?.hargaJual}</Text>
-            <TouchableOpacity
-              style={styles.addButton}
-              onPress={() => handleAddToCart(item)}>
-              <Text style={styles.addButtonLabel}>Tambah</Text>
-            </TouchableOpacity>
-          </View>
-        ))}
-      </View>
-    );
-  };
+      setKeranjang(filteredKeranjang);
+      setTotalItems((prevTotal) => prevTotal - 1);
 
-  const renderModalContent = () => {
-    return (
-      <View style={styles.modalContent}>
-        <Text style={styles.modalTitle}>Keranjang Belanja</Text>
-        <View style={styles.cartItems}>
-          {keranjang.map((item: any, index: number) => (
-            <View style={styles.cartItem} key={`${item?.kodeBarang}-${index}`}>
-              <Text style={styles.cartItemText}>{item?.namaBarang}</Text>
-            </View>
-          ))}
-        </View>
-        <TouchableOpacity style={styles.closeButton} onPress={handleCloseModal}>
-          <Text style={styles.closeButtonText}>Tutup</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  };
-
-  const renderContent = () => {
-    if (!userData) {
-      return (
-        <View style={styles.contentContainer}>
-          <Text style={styles.emptyText}>
-            Data kosong dan Anda belum terdaftar
-          </Text>
-          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-            <Text style={styles.buttonText}>Login terlebih dahulu</Text>
-          </TouchableOpacity>
-        </View>
-      );
-    } else if (userData !== null && dataBarang.length === 0) {
-      return (
-        <View style={styles.contentContainer}>
-          <Text style={styles.emptyText}>
-            Belum ada data yang Anda masukkan
-          </Text>
-          <TouchableOpacity
-            style={styles.createButton}
-            onPress={handleCreateData}>
-            <Text style={styles.buttonText}>Masukkan Data</Text>
-          </TouchableOpacity>
-        </View>
-      );
-    } else {
-      return renderTable();
+      await AsyncStorage.setItem('keranjang', JSON.stringify(filteredKeranjang));
+    } catch (error) {
+      console.log(error);
     }
+  };
+
+  const handleCheckout = async () => {
+    // Lakukan logika checkout
+    // Misalnya, melakukan pengiriman data keranjang ke server atau proses pembayaran
+
+    // Setelah proses checkout selesai, kosongkan keranjang
+    setKeranjang([]);
+    setTotalItems(0);
+    await AsyncStorage.removeItem('keranjang');
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Data Barang Toko {userData?.namaToko}</Text>
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Cari barang..."
-        value={searchKeyword}
-        onChangeText={handleSearch}
-      />
-      {renderContent()}
-
-      {totalItems > 0 && (
-        <TouchableOpacity
-          style={styles.keranjangIcon}
-          onPress={handleOpenModal}>
-          <AntDesign name="shoppingcart" size={24} color="white" />
-          <View style={styles.keranjangBadge}>
-            <Text style={styles.keranjangBadgeText}>{totalItems}</Text>
+      <View style={styles.header}>
+      <TouchableOpacity onPress={() => navigation.goBack()}>
+        <Icon name="arrowleft" size={24} color="black" />
+      </TouchableOpacity>
+        <Text style={styles.title}>Checkout</Text>
+      </View>
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search"
+          value={searchKeyword}
+          onChangeText={handleSearch}
+        />
+      </View>
+      <ScrollView>
+        {dataBarang.map((item) => (
+          <View key={item.kodeBarang} style={styles.itemContainer}>
+            <Text style={styles.itemName}>{item.namaBarang}</Text>
+            <Text style={styles.itemPrice}>Rp {item.hargaJual}</Text>
+            <TouchableOpacity style={styles.addButton} onPress={() => handleAddToCart(item)}>
+              <Text style={styles.buttonText}>Tambah Barang</Text>
+            </TouchableOpacity>
           </View>
-        </TouchableOpacity>
-      )}
-
-      <Modal visible={keranjangVisible} animationType="fade" transparent={true}>
-        <View style={styles.modalContainer}>{renderModalContent()}</View>
+        ))}
+      </ScrollView>
+      <Modal visible={keranjangVisible} animationType="slide">
+        <View style={styles.modalContainer}>
+          <Text style={styles.modalTitle}>Shopping Cart</Text>
+          <ScrollView>
+            {keranjang.map((item) => (
+              <View key={item.kodeBarang} style={styles.cartItemContainer}>
+                <Text style={styles.cartItemName}>{item.namaBarang}</Text>
+                <TouchableOpacity
+                  style={styles.removeButton}
+                  onPress={() => handleRemoveFromCart(item)}
+                >
+                  <Text style={styles.buttonText}>Remove</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </ScrollView>
+          <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckout}>
+            <Text style={styles.buttonText}>Checkout</Text>
+          </TouchableOpacity>
+        </View>
       </Modal>
+      <TouchableOpacity style={styles.cartButton} onPress={() => setKeranjangVisible(true)}>
+        <Text style={styles.cartButtonText}>{totalItems}</Text>
+        <Icon name="arrowleft" size={24} color="white" />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -227,136 +186,106 @@ const CheckoutPage: React.FC<ItemPageProps> = ({navigation, route}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    paddingTop: 50,
+    paddingHorizontal: 20,
+    backgroundColor: '#fff',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 16,
+    marginLeft: 10,
+  },
+  searchContainer: {
+    marginBottom: 20,
   },
   searchInput: {
-    height: 40,
     borderWidth: 1,
-    borderColor: 'gray',
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    marginBottom: 16,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
   },
-  contentContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+  itemContainer: {
+    marginBottom: 10,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
   },
-  emptyText: {
+  itemName: {
     fontSize: 16,
-    marginBottom: 16,
-  },
-  loginButton: {
-    backgroundColor: 'blue',
-    padding: 8,
-    borderRadius: 8,
-  },
-  createButton: {
-    backgroundColor: 'green',
-    padding: 8,
-    borderRadius: 8,
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  tableContainer: {
-    flex: 1,
-  },
-  tableRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  columnHeader: {
-    flex: 1,
     fontWeight: 'bold',
   },
-  tableData: {
-    flex: 1,
+  itemPrice: {
+    marginTop: 5,
+    fontSize: 14,
+    color: '#888',
   },
   addButton: {
-    backgroundColor: 'green',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 4,
+    marginTop: 10,
+    backgroundColor: 'blue',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderRadius: 5,
   },
-  addButtonLabel: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  keranjangIcon: {
-    position: 'absolute',
-    bottom: 16,
-    right: 16,
-    backgroundColor: 'green',
-    borderRadius: 16,
-    padding: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  keranjangBadge: {
-    backgroundColor: 'red',
-    borderRadius: 16,
-    width: 24,
-    height: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: 8,
-  },
-  keranjangBadgeText: {
+  buttonText: {
     color: 'white',
     fontWeight: 'bold',
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    padding: 16,
-    borderRadius: 8,
-    alignItems: 'center',
+    paddingTop: 50,
+    paddingHorizontal: 20,
+    backgroundColor: '#fff',
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 16,
+    marginBottom: 20,
   },
-  cartItems: {
-    maxHeight: 200,
-    marginBottom: 16,
+  cartItemContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
   },
-  cartItem: {
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderWidth: 1,
-    borderColor: 'gray',
-    borderRadius: 4,
-    marginBottom: 8,
-    width: '100%',
-  },
-  cartItemText: {
+  cartItemName: {
+    fontSize: 16,
     fontWeight: 'bold',
   },
-  closeButton: {
+  removeButton: {
     backgroundColor: 'red',
-    padding: 8,
-    borderRadius: 8,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderRadius: 5,
   },
-  closeButtonText: {
+  checkoutButton: {
+    marginTop: 20,
+    backgroundColor: 'green',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderRadius: 5,
+  },
+  cartButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    backgroundColor: 'blue',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderRadius: 50,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  cartButtonText: {
     color: 'white',
     fontWeight: 'bold',
-    textAlign: 'center',
+    marginRight: 5,
   },
 });
 
