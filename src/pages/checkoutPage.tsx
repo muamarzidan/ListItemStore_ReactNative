@@ -3,8 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, Modal, ScrollView 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/AntDesign';
-
+import Icon from 'react-native-vector-icons/FontAwesome'; // Ganti dengan pustaka ikon yang Anda gunakan
 
 type RootStackParamList = {
   itemPage: undefined;
@@ -94,69 +93,87 @@ const CheckoutPage: React.FC<ItemPageProps> = ({ navigation, route }) => {
     }
   };
 
-  const handleRemoveFromCart = async (item: BarangItem) => {
+  const handleRemoveFromCart = async (item: KeranjangItem) => {
     try {
-      const updatedKeranjang = keranjang.map((cartItem) => {
-        if (cartItem.kodeBarang === item.kodeBarang) {
-          return {
-            ...cartItem,
-            quantity: cartItem.quantity - 1,
-          };
-        }
-        return cartItem;
-      });
+      if (item.quantity === 1) {
+        const updatedKeranjang = keranjang.filter((cartItem) => cartItem.kodeBarang !== item.kodeBarang);
+        setKeranjang(updatedKeranjang);
+        await AsyncStorage.setItem('keranjang', JSON.stringify(updatedKeranjang));
+      } else {
+        const updatedKeranjang = keranjang.map((cartItem) => {
+          if (cartItem.kodeBarang === item.kodeBarang) {
+            return {
+              ...cartItem,
+              quantity: cartItem.quantity - 1,
+            };
+          }
+          return cartItem;
+        });
+        setKeranjang(updatedKeranjang);
+        await AsyncStorage.setItem('keranjang', JSON.stringify(updatedKeranjang));
+      }
 
-      const filteredKeranjang = updatedKeranjang.filter((cartItem) => cartItem.quantity > 0);
-
-      setKeranjang(filteredKeranjang);
       setTotalItems((prevTotal) => prevTotal - 1);
-
-      await AsyncStorage.setItem('keranjang', JSON.stringify(filteredKeranjang));
     } catch (error) {
       console.log(error);
     }
   };
 
   const handleCheckout = async () => {
-    // Lakukan logika checkout
-    // Misalnya, melakukan pengiriman data keranjang ke server atau proses pembayaran
+    // Lakukan proses checkout di sini
+    // Misalnya, kirim data keranjang ke server atau lakukan proses pembayaran
 
     // Setelah proses checkout selesai, kosongkan keranjang
     setKeranjang([]);
     setTotalItems(0);
-    await AsyncStorage.removeItem('keranjang');
+
+    // Simpan keranjang yang kosong ke penyimpanan lokal
+    await AsyncStorage.setItem('keranjang', JSON.stringify([]));
   };
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Icon name="arrowleft" size={24} color="black" />
-      </TouchableOpacity>
-        <Text style={styles.title}>Checkout</Text>
-      </View>
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search"
-          value={searchKeyword}
-          onChangeText={handleSearch}
-        />
-      </View>
+      <Text style={styles.headerText}>Checkout Page</Text>
+
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Search..."
+        value={searchKeyword}
+        onChangeText={handleSearch}
+      />
+
       <ScrollView>
-        {dataBarang.map((item) => (
-          <View key={item.kodeBarang} style={styles.itemContainer}>
-            <Text style={styles.itemName}>{item.namaBarang}</Text>
-            <Text style={styles.itemPrice}>Rp {item.hargaJual}</Text>
-            <TouchableOpacity style={styles.addButton} onPress={() => handleAddToCart(item)}>
-              <Text style={styles.buttonText}>Tambah Barang</Text>
+        {dataBarang
+          .filter((item) =>
+            item.namaBarang.toLowerCase().includes(searchKeyword.toLowerCase())
+          )
+          .map((item) => (
+            <TouchableOpacity
+              key={item.kodeBarang}
+              style={styles.itemContainer}
+              onPress={() => handleAddToCart(item)}
+            >
+              <Text style={styles.itemName}>{item.namaBarang}</Text>
+              <Text style={styles.itemPrice}>
+                {typeof item.hargaJual=== 'string' ? item.hargaJual : item.hargaJual.toFixed(2)}
+            </Text>
+              <Icon name="plus" size={20} color="black" />
             </TouchableOpacity>
-          </View>
-        ))}
+          ))}
       </ScrollView>
+
+      <TouchableOpacity
+        style={styles.cartButton}
+        onPress={() => setKeranjangVisible(true)}
+      >
+        <Text style={styles.cartButtonText}>Cart ({totalItems})</Text>
+      </TouchableOpacity>
+
       <Modal visible={keranjangVisible} animationType="slide">
         <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>Shopping Cart</Text>
+          <Text style={styles.modalTitle} onPress={() => setKeranjangVisible(false)}>
+            Shopping Cart
+          </Text>
           <ScrollView>
             {keranjang.map((item) => (
               <View key={item.kodeBarang} style={styles.cartItemContainer}>
@@ -169,16 +186,13 @@ const CheckoutPage: React.FC<ItemPageProps> = ({ navigation, route }) => {
                 </TouchableOpacity>
               </View>
             ))}
+            <Text style={styles.totalText}>Total: ${keranjang.reduce((total, item) => total + item.hargaJual * item.quantity, 0).toFixed(2)}</Text>
           </ScrollView>
           <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckout}>
             <Text style={styles.buttonText}>Checkout</Text>
           </TouchableOpacity>
         </View>
       </Modal>
-      <TouchableOpacity style={styles.cartButton} onPress={() => setKeranjangVisible(true)}>
-        <Text style={styles.cartButtonText}>{totalItems}</Text>
-        <Icon name="arrowleft" size={24} color="white" />
-      </TouchableOpacity>
     </View>
   );
 };
@@ -186,106 +200,93 @@ const CheckoutPage: React.FC<ItemPageProps> = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 50,
-    paddingHorizontal: 20,
-    backgroundColor: '#fff',
+    padding: 20,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  title: {
+  headerText: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginLeft: 10,
-  },
-  searchContainer: {
-    marginBottom: 20,
+    marginBottom: 10,
   },
   searchInput: {
+    height: 40,
+    borderColor: 'gray',
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
+    marginBottom: 10,
+    paddingHorizontal: 10,
   },
   itemContainer: {
-    marginBottom: 10,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderBottomColor: 'gray',
+    borderBottomWidth: 1,
+    paddingVertical: 10,
   },
   itemName: {
     fontSize: 16,
-    fontWeight: 'bold',
   },
   itemPrice: {
-    marginTop: 5,
-    fontSize: 14,
-    color: '#888',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
-  addButton: {
-    marginTop: 10,
+  cartButton: {
     backgroundColor: 'blue',
-    paddingHorizontal: 15,
+    paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 5,
+    marginTop: 20,
   },
-  buttonText: {
+  cartButtonText: {
     color: 'white',
+    fontSize: 16,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   modalContainer: {
     flex: 1,
-    paddingTop: 50,
-    paddingHorizontal: 20,
-    backgroundColor: '#fff',
+    padding: 20,
   },
   modalTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   cartItemContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    justifyContent: 'space-between',
+    borderBottomColor: 'gray',
+    borderBottomWidth: 1,
+    paddingVertical: 10,
   },
   cartItemName: {
     fontSize: 16,
-    fontWeight: 'bold',
   },
   removeButton: {
     backgroundColor: 'red',
-    paddingHorizontal: 15,
-    paddingVertical: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
     borderRadius: 5,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  totalText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 10,
+    marginBottom: 20,
+    textAlign: 'right',
   },
   checkoutButton: {
-    marginTop: 20,
     backgroundColor: 'green',
-    paddingHorizontal: 15,
+    paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 5,
-  },
-  cartButton: {
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
-    backgroundColor: 'blue',
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    borderRadius: 50,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  cartButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    marginRight: 5,
+    marginTop: 10,
   },
 });
 
